@@ -89,7 +89,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .brand img { width: 24px; height: 24px; }
 .nav-links { display: flex; align-items: center; gap: 26px; font-size: 14px; color: var(--muted); }
 .nav-links a { transition: color 150ms ease; }
-@media (hover: hover) and (pointer: fine) { .nav-links a:hover { color: var(--ink); } }
+@media (hover: hover) and (pointer: fine) { .nav-links a:not(.btn):hover { color: var(--ink); } }
 
 /* ---------- Buttons ---------- */
 .btn {
@@ -287,7 +287,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .nav.on-dark .brand { color: #f3f0f8; }
 .nav.on-dark .nav-links a:not(.btn) { color: #a9a3b8; }
 .nav.on-dark .btn-dark { background: #f3f0f8; color: var(--ink); }
-@media (hover: hover) and (pointer: fine) { .nav.on-dark .nav-links a:not(.btn):hover { color: #fff; } }
+@media (hover: hover) and (pointer: fine) {
+  .nav.on-dark .nav-links a:not(.btn):hover { color: #fff; }
+  .nav.on-dark .btn-dark:hover { background: #fff; }
+}
 
 /* Tabs with a clip-path pill (used by the feature chapters) */
 .tabs {
