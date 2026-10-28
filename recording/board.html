@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Acme · Launch week</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #fbfbfa; --panel: #ffffff; --side: #f4f4f2; --ink: #17161c; --ink-2: #3f3d48; --muted: #75727f; --faint: #a3a0ab;
+  --line: rgba(23, 22, 28, 0.08); --line-2: rgba(23, 22, 28, 0.13);
+  --brand: #5b5bd6; --brand-2: #4a48c7; --brand-soft: rgba(91, 91, 214, 0.1);
+  --green: #2f9e6b; --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  font: 400 14px/1.5 "Inter", system-ui, sans-serif; color: var(--ink); background: var(--bg);
+  -webkit-font-smoothing: antialiased; overflow: hidden; user-select: none;
+  display: grid; grid-template-columns: 240px 1fr; grid-template-rows: 44px 1fr;
+}
+button { font: inherit; color: inherit; border: 0; background: none; padding: 0; cursor: pointer; }
+svg { display: block; }
+
+/* Title bar (drag region for the window) */
+.titlebar { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; padding: 0 16px; background: var(--side); border-bottom: 1px solid var(--line); -webkit-app-region: drag; }
+.titlebar .crumb { font-size: 13px; color: var(--muted); }
+.titlebar .crumb b { color: var(--ink); font-weight: 500; }
+
+/* Sidebar */
+.side { background: var(--side); border-right: 1px solid var(--line); padding: 14px 12px; display: flex; flex-direction: column; gap: 2px; }
+.ws { display: flex; align-items: center; gap: 10px; padding: 6px 8px 14px; font-weight: 600; font-size: 15px; }
+.ws .logo { width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(135deg, #7272ec, #4a48c7); display: grid; place-items: center; color: #fff; font-size: 13px; font-weight: 700; box-shadow: 0 1px 2px rgba(74,72,199,.4); }
+.search { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; margin-bottom: 10px; border-radius: 8px; background: var(--panel); box-shadow: 0 0 0 1px var(--line); color: var(--faint); font-size: 13px; }
+.search kbd { margin-left: auto; font: 500 11px "Inter"; color: var(--faint); }
+.nav { display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 10px; border-radius: 8px; color: var(--ink-2); font-size: 13.5px; }
+.nav svg { width: 16px; height: 16px; color: var(--muted); }
+.nav .n { margin-left: auto; font-size: 12px; color: var(--muted); }
+.nav.on { background: var(--panel); box-shadow: 0 0 0 1px var(--line), 0 1px 2px rgba(0,0,0,.03); color: var(--ink); font-weight: 500; }
+.nav.on svg { color: var(--brand); }
+.side h6 { margin: 18px 10px 6px; font-size: 11.5px; font-weight: 500; color: var(--faint); }
+.dot { width: 8px; height: 8px; border-radius: 3px; }
+
+/* Main */
+.main { display: flex; flex-direction: column; min-width: 0; }
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding: 26px 32px 18px; }
+.head h1 { margin: 0; font-size: 26px; letter-spacing: -0.02em; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+.head h1 .em { font-size: 22px; }
+.head p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+.actions { display: flex; align-items: center; gap: 10px; }
+.avatars { display: flex; margin-right: 6px; }
+.av { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--bg); display: grid; place-items: center; font-size: 11px; font-weight: 600; color: #fff; }
+.avatars .av + .av { margin-left: -8px; }
+.btn { display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px; border-radius: 9px; font-weight: 500; font-size: 13.5px; transition: transform 160ms var(--ease-out), background-color 150ms ease, box-shadow 150ms ease; }
+.btn:active { transform: scale(0.97); }
+.btn svg { width: 15px; height: 15px; }
+.btn-ghost { background: var(--panel); box-shadow: 0 0 0 1px var(--line-2), 0 1px 2px rgba(0,0,0,.04); }
+.btn-ghost:hover { background: #f7f7f6; }
+.btn-primary { color: #fff; background: var(--brand); box-shadow: 0 1px 0 rgba(255,255,255,.15) inset, 0 1px 2px rgba(74,72,199,.35), 0 4px 12px -4px rgba(74,72,199,.5); }
+.btn-primary:hover { background: var(--brand-2); }
+
+.toolbar { display: flex; align-items: center; gap: 8px; padding: 0 32px 16px; border-bottom: 1px solid var(--line); }
+.seg { display: inline-flex; padding: 3px; border-radius: 9px; background: var(--side); box-shadow: inset 0 0 0 1px var(--line); }
+.seg span { height: 26px; padding: 0 12px; display: grid; place-items: center; border-radius: 7px; font-size: 12.5px; color: var(--muted); }
+.seg span.on { background: var(--panel); color: var(--ink); font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 0 0 1px var(--line); }
+.chipf { height: 30px; padding: 0 10px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); box-shadow: inset 0 0 0 1px var(--line-2); }
+.chipf svg { width: 13px; height: 13px; }
+
+/* Board */
+.board { flex: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; padding: 20px 32px 28px; min-height: 0; }
+.col { display: flex; flex-direction: column; min-height: 0; border-radius: 14px; background: rgba(23,22,28,0.025); box-shadow: inset 0 0 0 1px var(--line); padding: 12px; transition: background-color 200ms ease, box-shadow 200ms ease; }
+.col.over { background: var(--brand-soft); box-shadow: inset 0 0 0 1.5px rgba(91,91,214,.45); }
+.col-h { display: flex; align-items: center; gap: 8px; padding: 2px 4px 12px; font-size: 13px; font-weight: 600; }
+.col-h .ic { width: 14px; height: 14px; border-radius: 50%; border: 1.8px solid currentColor; }
+.col[data-col="todo"] .col-h .ic { color: #a3a0ab; }
+.col[data-col="doing"] .col-h .ic { color: #e2a336; border-style: solid; background: conic-gradient(#e2a336 0 50%, transparent 0); }
+.col[data-col="done"] .col-h .ic { color: var(--green); background: var(--green); }
+.col-h .count { color: var(--faint); font-weight: 500; }
+.col-h .plus { margin-left: auto; width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; color: var(--faint); }
+.cards { display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 40px; }
+
+.card {
+  background: var(--panel); border-radius: 11px; padding: 13px 14px 12px;
+  box-shadow: 0 0 0 1px var(--line), 0 1px 2px rgba(0,0,0,.04);
+  cursor: grab; touch-action: none;
+  transition: box-shadow 150ms ease;
+}
+.card:hover { box-shadow: 0 0 0 1px var(--line-2), 0 2px 6px rgba(0,0,0,.05); }
+.card .top { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--faint); font-weight: 500; }
+.card .top .chk { margin-left: auto; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; background: var(--green); color: #fff; transform: scale(0); opacity: 0; transition: transform 350ms cubic-bezier(.34,1.56,.64,1), opacity 150ms ease; }
+.card .top .chk svg { width: 11px; height: 11px; }
+.card.is-done .top .chk { transform: scale(1); opacity: 1; }
+.card .t { margin-top: 5px; font-size: 14px; font-weight: 500; color: var(--ink); line-height: 1.4; transition: color 250ms ease; }
+.card.is-done .t { color: var(--muted); }
+.card .meta { margin-top: 11px; display: flex; align-items: center; gap: 6px; }
+.tag { height: 22px; padding: 0 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line-2); }
+.tag i { width: 7px; height: 7px; border-radius: 50%; }
+.due { font-size: 11.5px; color: var(--muted); display: inline-flex; align-items: center; gap: 4px; }
+.due svg { width: 12px; height: 12px; }
+.card .meta .av { margin-left: auto; width: 22px; height: 22px; border: 0; font-size: 9.5px; }
+
+.card.placeholder { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(91,91,214,.35); border-radius: 11px; }
+.card.placeholder > * { visibility: hidden; }
+.ghost { position: fixed; left: 0; top: 0; z-index: 50; pointer-events: none; margin: 0; cursor: grabbing;
+  box-shadow: 0 0 0 1px var(--line-2), 0 18px 40px -12px rgba(23,22,28,.35), 0 4px 10px rgba(23,22,28,.08); }
+.ghost .inner { transform: rotate(2deg) scale(1.02); transition: transform 200ms var(--ease-out); }
+.enter { animation: cardIn 420ms var(--ease-out) both; }
+@keyframes cardIn { from { opacity: 0; transform: translateY(-8px) scale(0.97); } to { opacity: 1; transform: none; } }
+
+/* Composer */
+.composer { background: var(--panel); border-radius: 11px; padding: 12px 14px; box-shadow: 0 0 0 1.5px var(--brand), 0 0 0 5px rgba(91,91,214,.12); animation: cardIn 300ms var(--ease-out) both; }
+.composer input { width: 100%; border: 0; outline: 0; font: 500 14px "Inter"; color: var(--ink); background: transparent; padding: 2px 0; caret-color: var(--brand); }
+.composer input::placeholder { color: var(--faint); font-weight: 400; }
+.composer .hint { margin-top: 10px; display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--faint); }
+.composer kbd { font: 500 11px "Inter"; padding: 2px 6px; border-radius: 5px; box-shadow: inset 0 0 0 1px var(--line-2); color: var(--muted); }
+
+/* Share popover */
+.share-wrap { position: relative; }
+.pop {
+  position: absolute; right: 0; top: calc(100% + 10px); z-index: 40; width: 360px;
+  background: var(--panel); border-radius: 14px; padding: 16px;
+  box-shadow: 0 0 0 1px var(--line-2), 0 24px 48px -16px rgba(23,22,28,.25), 0 6px 14px rgba(23,22,28,.06);
+  transform-origin: top right; opacity: 0; transform: scale(0.96) translateY(-4px); pointer-events: none;
+  transition: opacity 180ms ease, transform 220ms var(--ease-out);
+}
+.pop.open { opacity: 1; transform: none; pointer-events: auto; }
+.pop h3 { margin: 0; font-size: 15px; font-weight: 600; }
+.pop .sub { margin: 2px 0 14px; font-size: 12.5px; color: var(--muted); }
+.invite { display: flex; gap: 8px; }
+.invite .in { flex: 1; height: 34px; border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line-2); display: flex; align-items: center; padding: 0 10px; font-size: 13px; color: var(--faint); }
+.people { margin-top: 14px; display: grid; gap: 10px; }
+.person { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.person .av { width: 26px; height: 26px; border: 0; font-size: 10px; }
+.person .role { color: var(--muted); margin-left: auto; font-size: 12.5px; }
+.pub { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 12px; }
+.pub .txt b { display: block; font-size: 13px; font-weight: 600; }
+.pub .txt span { font-size: 12px; color: var(--muted); }
+.pub .btn { margin-left: auto; min-width: 92px; justify-content: center; position: relative; }
+.spin { width: 15px; height: 15px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; animation: spin 600ms linear infinite; display: none; }
+.pub .btn.loading .spin { display: block; }
+.pub .btn.loading .lbl { display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Toast */
+.toast {
+  position: fixed; right: 28px; bottom: 28px; z-index: 60; width: 340px;
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 14px;
+  background: #17161c; color: #fff; box-shadow: 0 20px 40px -12px rgba(23,22,28,.45);
+  transform: translateY(calc(100% + 40px)); opacity: 0;
+  transition: transform 450ms var(--ease-out), opacity 250ms ease;
+}
+.toast.show { transform: none; opacity: 1; }
+.toast .ok { width: 30px; height: 30px; border-radius: 50%; background: var(--green); display: grid; place-items: center; flex: none; }
+.toast .ok svg { width: 16px; height: 16px; }
+.toast b { display: block; font-size: 14px; font-weight: 600; }
+.toast span { font-size: 12.5px; color: #b5b2c0; }
+.toast .copy { margin-left: auto; height: 30px; padding: 0 12px; border-radius: 8px; background: rgba(255,255,255,.1); font-size: 12.5px; font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="titlebar"><span class="crumb">Acme / Projects / <b>Launch week</b></span></div>
+
+<aside class="side">
+  <div class="ws"><span class="logo">A</span>Acme</div>
+  <div class="search"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg>Search<kbd>Ctrl K</kbd></div>
+  <div class="nav"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 9.5h3.2l1 2h3.6l1-2H14M2 9.5 4 3h8l2 6.5V13H2V9.5Z" stroke-linejoin="round"/></svg>Inbox<span class="n">3</span></div>
+  <div class="nav"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.5"/><path d="m5.8 8 1.5 1.5L10.4 6.4" stroke-linecap="round" stroke-linejoin="round"/></svg>My tasks</div>
+  <div class="nav on"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2.5" width="12" height="11" rx="2"/><path d="M6 2.5v11M10 2.5v11"/></svg>Projects</div>
+  <div class="nav"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" stroke-linecap="round"/></svg>Calendar</div>
+  <h6>Teams</h6>
+  <div class="nav"><span class="dot" style="background:#e46aa0"></span>Design</div>
+  <div class="nav"><span class="dot" style="background:#5b5bd6"></span>Engineering</div>
+  <div class="nav"><span class="dot" style="background:#e2a336"></span>Marketing</div>
+</aside>
+
+<main class="main">
+  <div class="head">
+    <div>
+      <h1><span class="em">🚀</span>Launch week</h1>
+      <p>Everything we need to ship v2.0 by Friday.</p>
+    </div>
+    <div class="actions">
+      <div class="avatars">
+        <span class="av" style="background:#e46aa0">MR</span>
+        <span class="av" style="background:#5b5bd6">JK</span>
+        <span class="av" style="background:#2f9e6b">SL</span>
+      </div>
+      <div class="share-wrap">
+        <button class="btn btn-ghost" id="shareBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10V2.5M5 5.5l3-3 3 3M3 9v3.5A1.5 1.5 0 0 0 4.5 14h7a1.5 1.5 0 0 0 1.5-1.5V9"/></svg>Share</button>
+        <div class="pop" id="pop">
+          <h3>Share Launch week</h3>
+          <p class="sub">Invite people or publish the board to the web.</p>
+          <div class="invite"><div class="in">Add people by email…</div><button class="btn btn-ghost">Invite</button></div>
+          <div class="people">
+            <div class="person"><span class="av" style="background:#e46aa0">MR</span>Maya Reyes<span class="role">Owner</span></div>
+            <div class="person"><span class="av" style="background:#5b5bd6">JK</span>Jon Kim<span class="role">Can edit</span></div>
+          </div>
+          <div class="pub">
+            <div class="txt"><b>Publish to web</b><span>Anyone with the link can view</span></div>
+            <button class="btn btn-primary" id="publishBtn"><span class="lbl">Publish</span><span class="spin"></span></button>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="newBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>New task</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="seg"><span class="on">Board</span><span>List</span><span>Timeline</span></div>
+    <span class="chipf"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M2.5 4h11M4.5 8h7M6.5 12h3"/></svg>Filter</span>
+    <span class="chipf">Due this week</span>
+  </div>
+
+  <div class="board">
+    <section class="col" data-col="todo">
+      <div class="col-h"><span class="ic"></span>Todo <span class="count">3</span><span class="plus">+</span></div>
+      <div class="cards">
+        <article class="card"><div class="top">ACM-48<span class="chk"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5"/></svg></span></div><div class="t">Record the product demo</div><div class="meta"><span class="tag"><i style="background:#e2a336"></i>Marketing</span><span class="due">Thu</span><span class="av" style="background:#e46aa0">MR</span></div></article>
+        <article class="card"><div class="top">ACM-51<span class="chk"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5"/></svg></span></div><div class="t">Write the launch post</div><div class="meta"><span class="tag"><i style="background:#e2a336"></i>Marketing</span><span class="due">Fri</span><span class="av" style="background:#2f9e6b">SL</span></div></article>
+        <article class="card"><div class="top">ACM-53<span class="chk"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5"/></svg></span></div><div class="t">Update pricing page copy</div><div class="meta"><span class="tag"><i style="background:#e46aa0"></i>Design</span><span class="due">Fri</span><span class="av" style="background:#5b5bd6">JK</span></div></article>
+      </div>
+    </section>
+    <section class="col" data-col="doing">
+      <div class="col-h"><span class="ic"></span>In progress <span class="count">2</span><span class="plus">+</span></div>
+      <div class="cards">
+        <article class="card" id="dragMe"><div class="top">ACM-42<span class="chk"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5"/></svg></span></div><div class="t">Polish onboarding flow</div><div class="meta"><span class="tag"><i style="background:#e46aa0"></i>Design</span><span class="due">Wed</span><span class="av" style="background:#e46aa0">MR</span></div></article>
+        <article class="card"><div class="top">ACM-45<span class="chk"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5"/></svg></span></div><div class="t">Fix sync on slow networks</div><div class="meta"><span class="tag"><i style="background:#5b5bd6"></i>Engineering</span><span class="due">Thu</span><span class="av" style="background:#5b5bd6">JK</span></div></article>
+      </div>
+    </section>
+    <section class="col" data-col="done">
+      <div class="col-h"><span class="ic"></span>Done <span class="count">2</span><span class="plus">+</span></div>
+      <div class="cards">
+        <article class="card is-done"><div class="top">ACM-37<span class="chk"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5"/></svg></span></div><div class="t">New app icon</div><div class="meta"><span class="tag"><i style="background:#e46aa0"></i>Design</span><span class="due">Mon</span><span class="av" style="background:#e46aa0">MR</span></div></article>
+        <article class="card is-done"><div class="top">ACM-39<span class="chk"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5"/></svg></span></div><div class="t">Release notes for v2.0</div><div class="meta"><span class="tag"><i style="background:#2f9e6b"></i>Docs</span><span class="due">Tue</span><span class="av" style="background:#2f9e6b">SL</span></div></article>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div class="toast" id="toast">
+  <span class="ok"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3.5 8.3 2.8 2.8 6.2-6.4"/></svg></span>
+  <div><b>Board published</b><span>acme.app/launch-week</span></div>
+  <button class="copy">Copy link</button>
+</div>
+
+<script>
+(function () {
+  var CHECK = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5"/></svg>';
+  var nextId = 54;
+
+  function updateCounts() {
+    document.querySelectorAll(".col").forEach(function (col) {
+      col.querySelector(".count").textContent = col.querySelectorAll(".cards > .card:not(.placeholder)").length;
+    });
+  }
+
+  // New task: inline composer at the top of Todo; Enter creates the card.
+  var todo = document.querySelector('[data-col="todo"] .cards');
+  document.getElementById("newBtn").addEventListener("click", function () {
+    if (todo.querySelector(".composer")) { todo.querySelector("input").focus(); return; }
+    var c = document.createElement("div");
+    c.className = "composer";
+    c.innerHTML = '<input placeholder="Task title" spellcheck="false"><div class="hint"><kbd>Enter</kbd> to create · <kbd>Esc</kbd> to cancel</div>';
+    todo.prepend(c);
+    var input = c.querySelector("input");
+    input.focus();
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") { c.remove(); return; }
+      if (e.key !== "Enter" || !input.value.trim()) return;
+      var card = document.createElement("article");
+      card.className = "card enter";
+      card.innerHTML = '<div class="top">ACM-' + (nextId++) + '<span class="chk">' + CHECK + '</span></div><div class="t"></div>' +
+        '<div class="meta"><span class="tag"><i style="background:#5b5bd6"></i>Engineering</span><span class="due">Fri</span><span class="av" style="background:#5b5bd6">JK</span></div>';
+      card.querySelector(".t").textContent = input.value.trim();
+      c.replaceWith(card);
+      bindDrag(card);
+      updateCounts();
+    });
+  });
+
+  // Drag and drop between columns, with a lifted ghost and a placeholder.
+  function bindDrag(card) {
+    card.addEventListener("pointerdown", function (e) {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      var r = card.getBoundingClientRect();
+      var dx = e.clientX - r.left, dy = e.clientY - r.top;
+      var ghost = card.cloneNode(true);
+      ghost.classList.remove("enter");
+      ghost.classList.add("ghost");
+      ghost.style.width = r.width + "px";
+      ghost.innerHTML = '<div class="inner">' + ghost.innerHTML + "</div>";
+      document.body.appendChild(ghost);
+      card.classList.add("placeholder");
+      var overCol = null;
+      function move(ev) {
+        ghost.style.transform = "translate(" + (ev.clientX - dx) + "px," + (ev.clientY - dy) + "px)";
+        var el = document.elementFromPoint(ev.clientX, ev.clientY);
+        var col = el && el.closest(".col");
+        if (overCol && overCol !== col) overCol.classList.remove("over");
+        overCol = col;
+        if (!col) return;
+        if (col.dataset.col !== card.closest(".col").dataset.col) col.classList.add("over");
+        var list = col.querySelector(".cards");
+        var after = null;
+        [].slice.call(list.children).forEach(function (c) {
+          if (c === card || after) return;
+          var b = c.getBoundingClientRect();
+          if (ev.clientY < b.top + b.height / 2) after = c;
+        });
+        if (after) { if (card.nextSibling !== after) list.insertBefore(card, after); }
+        else if (list.lastElementChild !== card) list.appendChild(card);
+      }
+      function up() {
+        removeEventListener("pointermove", move);
+        removeEventListener("pointerup", up);
+        if (overCol) overCol.classList.remove("over");
+        // Settle the ghost into the placeholder, then swap back to the real card.
+        var t = card.getBoundingClientRect();
+        ghost.style.transition = "transform 280ms cubic-bezier(0.23, 1, 0.32, 1)";
+        ghost.style.transform = "translate(" + t.left + "px," + t.top + "px)";
+        ghost.querySelector(".inner").style.transform = "none";
+        setTimeout(function () {
+          ghost.remove();
+          card.classList.remove("placeholder");
+          var done = card.closest(".col").dataset.col === "done";
+          card.classList.toggle("is-done", done);
+          updateCounts();
+        }, 280);
+      }
+      move(e);
+      addEventListener("pointermove", move);
+      addEventListener("pointerup", up);
+    });
+  }
+  document.querySelectorAll(".card").forEach(bindDrag);
+
+  // Share popover → Publish → toast.
+  var pop = document.getElementById("pop"), toast = document.getElementById("toast");
+  document.getElementById("shareBtn").addEventListener("click", function (e) {
+    e.stopPropagation();
+    pop.classList.toggle("open");
+  });
+  document.addEventListener("click", function (e) { if (!pop.contains(e.target)) pop.classList.remove("open"); });
+  var pub = document.getElementById("publishBtn");
+  pub.addEventListener("click", function () {
+    pub.classList.add("loading");
+    setTimeout(function () {
+      pub.classList.remove("loading");
+      pop.classList.remove("open");
+      toast.classList.add("show");
+      setTimeout(function () { toast.classList.remove("show"); }, 3200);
+    }, 700);
+  });
+
+  // F5 resets the board for another take.
+  addEventListener("keydown", function (e) { if (e.key === "F5") location.reload(); });
+})();
+</script>
+</body>
+</html>
