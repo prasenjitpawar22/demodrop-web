@@ -170,23 +170,29 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   max-width: 100%; overflow-x: auto; scrollbar-width: none;
 }
 .tabs::-webkit-scrollbar { display: none; }
-.tab-ind {
-  position: absolute; top: 4px; bottom: 4px; left: 0; border-radius: 999px; background: var(--ink);
-  transition: transform 350ms var(--ease-out), width 350ms var(--ease-out);
-}
 .tab {
-  position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 14px;
+  position: relative; display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 14px;
   border-radius: 999px; font-size: 13.5px; font-weight: 500; color: var(--muted); white-space: nowrap;
-  transition: color 200ms ease;
+  transition: color 150ms ease;
 }
 .tab svg { width: 15px; height: 15px; }
-.tab[aria-selected="true"] { color: #fff; }
-.tab .prog { position: absolute; left: 14px; right: 14px; bottom: 4px; height: 2px; border-radius: 2px; background: rgba(255,255,255,0.3); overflow: hidden; opacity: 0; }
+@media (hover: hover) and (pointer: fine) { .tabs > .tab:hover { color: var(--ink); } }
+/* Highlight layer: a white-on-ink copy of the tabs, clipped to the active tab.
+   Animating the clip makes the pill and its label color move as one shape,
+   so any label the pill passes over turns white exactly where it's covered. */
+.tabs-hl {
+  position: absolute; inset: 0; z-index: 2; padding: 4px; display: flex; gap: 2px;
+  border-radius: 999px; background: var(--ink); pointer-events: none;
+  clip-path: inset(4px 100% 4px 0 round 999px);
+}
+.tabs-hl.ready { transition: clip-path 420ms cubic-bezier(0.65, 0, 0.35, 1); }
+.tabs-hl .tab { color: #fff; }
+.tabs > .tab .prog { display: none; }
+.tab .prog { position: absolute; left: 14px; right: 14px; bottom: 4px; height: 2px; border-radius: 2px; background: rgba(255,255,255,0.28); overflow: hidden; opacity: 0; transition: opacity 200ms ease; }
 .tab .prog::after { content: ""; position: absolute; inset: 0; background: #fff; transform-origin: left; transform: scaleX(0); }
-.tabs.auto .tab[aria-selected="true"] .prog { opacity: 1; }
-.tabs.auto .tab[aria-selected="true"] .prog::after { animation: prog var(--dur, 7s) linear forwards; }
+.tabs.auto .tabs-hl .tab.on .prog { opacity: 1; }
+.tabs.auto .tabs-hl .tab.on .prog::after { animation: prog var(--dur, 7s) linear forwards; }
 @keyframes prog { to { transform: scaleX(1); } }
-@media (hover: hover) and (pointer: fine) { .tab[aria-selected="false"]:hover { color: var(--ink); } }
 
 .editor-wrap { position: relative; margin-top: 22px; }
 .editor-glow { position: absolute; inset: 10% 8% -2%; border-radius: 48px; background: var(--grad); filter: blur(70px); opacity: 0.32; }
@@ -573,7 +579,7 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
   .editor[data-mode="zoom"] .cursor-track { transform: translate(81.5%, 79.5%); }
   .ed-tl .head-rail { transform: translateX(40%); }
   .a-speed .ph { transform: translateX(50%); }
-  .canvas, .rec, .bgs i { transition-duration: 0ms; }
+  .canvas, .rec, .bgs i, .tabs-hl.ready { transition-duration: 0ms; }
   .js .reveal { transform: none; filter: none; transition: opacity 300ms ease; }
 }
 </style>
@@ -622,7 +628,7 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
 
       <div class="showcase enter d6">
         <div class="tabs auto" role="tablist" aria-label="See what Demodrop does">
-          <span class="tab-ind" aria-hidden="true"></span>
+          <div class="tabs-hl" aria-hidden="true"></div>
           <button class="tab" role="tab" aria-selected="true" data-mode="zoom" data-dur="7000">
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3M7 5v4M5 7h4"/></svg>Auto-zoom<span class="prog"></span></button>
           <button class="tab" role="tab" aria-selected="false" data-mode="cursor" data-dur="6400">
@@ -935,13 +941,21 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
   var editor = document.getElementById("editor");
   var tablist = document.querySelector(".tabs");
   var tabs = [].slice.call(tablist.querySelectorAll(".tab"));
-  var ind = tablist.querySelector(".tab-ind");
+  var hl = tablist.querySelector(".tabs-hl");
+  var copies = tabs.map(function (t) {
+    var s = document.createElement("span");
+    s.className = "tab";
+    s.innerHTML = t.innerHTML;
+    hl.appendChild(s);
+    return s;
+  });
   var current = 0, timer = null, sub = null, auto = !reduce, visible = true;
 
   function placeIndicator() {
     var t = tabs[current];
-    ind.style.width = t.offsetWidth + "px";
-    ind.style.transform = "translateX(" + t.offsetLeft + "px)";
+    var left = t.offsetLeft, right = hl.offsetWidth - left - t.offsetWidth;
+    hl.style.clipPath = "inset(4px " + right + "px 4px " + left + "px round 999px)";
+    copies.forEach(function (c, j) { c.classList.toggle("on", j === current); });
   }
   function runSub(mode) {
     clearInterval(sub); sub = null;
@@ -971,7 +985,7 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
     var dur = +tabs[current].dataset.dur;
     tablist.style.setProperty("--dur", dur + "ms");
     // Restart the progress bar on the active tab.
-    var p = tabs[current].querySelector(".prog");
+    var p = copies[current].querySelector(".prog");
     p.style.display = "none"; void p.offsetWidth; p.style.display = "";
     timer = setTimeout(function () { select((current + 1) % tabs.length, false); }, dur);
   }
@@ -995,6 +1009,10 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
     }).observe(editor);
   }
   select(0, false);
+  // Commit the first placement (forced style flush), then enable the slide,
+  // so the pill doesn't animate in from the left edge on load.
+  getComputedStyle(hl).clipPath;
+  hl.classList.add("ready");
 
   // Reveal on scroll.
   var els = document.querySelectorAll(".reveal");
