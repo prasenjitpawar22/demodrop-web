@@ -163,16 +163,54 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 @keyframes rise { from { opacity: 0; transform: translateY(14px); filter: blur(6px); } to { opacity: 1; transform: none; filter: blur(0); } }
 
 /* ---------- Showcase: tabs + editor ---------- */
-/* ---------- Hero video (made with Demodrop) ---------- */
-.hero-video { position: relative; margin: 60px auto 0; padding-bottom: 96px; max-width: 1080px; }
-.hv-glow { position: absolute; inset: 12% 6% 22%; border-radius: 48px; background: var(--grad); filter: blur(70px); opacity: 0.35; }
-.hv-frame {
-  position: relative; border-radius: 18px; overflow: hidden; aspect-ratio: 16 / 9; background: #1b1530;
-  box-shadow: 0 0 0 1px rgba(17,16,22,0.08), 0 0 0 7px rgba(255,255,255,0.6), 0 0 0 8px var(--line), 0 50px 100px -40px rgba(30, 10, 50, 0.55);
+/* ---------- Hero stage: the video grows to fill the screen as you scroll ---------- */
+/* Full-bleed, pinned while it grows. JS writes transform/opacity directly (no CSS vars per frame). */
+.stage-scroll { position: relative; z-index: 2; height: 175vh; width: 100vw; margin-left: calc(50% - 50vw); margin-top: 56px; }
+.stage-sticky { position: sticky; top: 0; height: 100vh; display: grid; place-items: center; overflow: hidden; }
+.stage-dim { position: absolute; inset: 0; background: #0b0a10; opacity: 0; pointer-events: none; }
+.stage-dim::after {
+  content: ""; position: absolute; left: 50%; top: 52%; width: 70vw; height: 60vh; transform: translate(-50%, -50%);
+  border-radius: 50%; background: var(--grad); filter: blur(120px); opacity: 0.35;
 }
-.hv-frame video { display: block; width: 100%; height: 100%; object-fit: cover; }
-.made-with { margin: 22px 0 0; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+.stage-wrap { position: relative; display: grid; justify-items: center; gap: 18px; }
+.stage {
+  position: relative; width: min(calc(100vw - 48px), calc((100vh - 120px) * 16 / 9)); aspect-ratio: 16 / 9;
+  border-radius: 22px; overflow: hidden; background: #1b1530;
+  transform-origin: 50% 0%; will-change: transform;
+  box-shadow: 0 0 0 1px rgba(17,16,22,0.1), 0 60px 120px -40px rgba(40, 10, 70, 0.6), 0 20px 40px -20px rgba(17,16,22,0.3);
+}
+.stage::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); pointer-events: none; }
+.stage video { display: block; width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
+/* Player chrome: appears on hover (pointer devices) and while paused */
+.stage-ui {
+  position: absolute; left: 16px; right: 16px; bottom: 16px; display: flex; align-items: center; gap: 12px;
+  padding: 8px 14px 8px 8px; border-radius: 999px;
+  background: rgba(14, 12, 20, 0.55); backdrop-filter: blur(14px) saturate(160%); -webkit-backdrop-filter: blur(14px) saturate(160%);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); color: #fff;
+  opacity: 0; transform: translateY(6px); transition: opacity 200ms ease, transform 250ms var(--ease-out);
+}
+.stage.paused .stage-ui, .stage:focus-within .stage-ui { opacity: 1; transform: none; }
+@media (hover: hover) and (pointer: fine) { .stage:hover .stage-ui { opacity: 1; transform: none; } }
+.sp { width: 32px; height: 32px; flex: none; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,0.14); transition: transform 160ms var(--ease-out), background-color 150ms ease; }
+.sp:active { transform: scale(0.92); }
+@media (hover: hover) and (pointer: fine) { .sp:hover { background: rgba(255,255,255,0.22); } }
+.sp svg { width: 14px; height: 14px; grid-area: 1 / 1; transition: opacity 150ms ease, transform 200ms var(--ease-out); }
+.sp .i-play { opacity: 0; transform: scale(0.7); }
+.stage.paused .sp .i-play { opacity: 1; transform: none; }
+.stage.paused .sp .i-pause { opacity: 0; transform: scale(0.7); }
+.stage-bar { position: relative; flex: 1; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.18); overflow: hidden; }
+.stage-bar i { position: absolute; inset: 0; border-radius: 4px; background: #fff; transform-origin: left; transform: scaleX(0); }
+.stage-time { font: 500 12px/1 "Geist Mono", ui-monospace, monospace; color: rgba(255,255,255,0.75); font-variant-numeric: tabular-nums; }
+.made-with { margin: 0; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); transition: color 300ms ease; }
 .made-with img { width: 16px; height: 16px; }
+.stage-scroll.dark .made-with { color: #a9a3b8; }
+/* Nav switches to a dark pill while the page is dimmed behind the stage */
+.nav .nav-inner, .nav .brand, .nav-links a:not(.btn), .nav .btn-dark { transition: max-width 500ms var(--ease-out), background-color 300ms ease, border-color 300ms ease, box-shadow 300ms ease, color 300ms ease, transform 160ms var(--ease-out); }
+.nav.on-dark .nav-inner { background-color: rgba(22, 20, 30, 0.72); border-color: rgba(255,255,255,0.1); box-shadow: 0 10px 30px -12px rgba(0,0,0,0.6); }
+.nav.on-dark .brand { color: #f3f0f8; }
+.nav.on-dark .nav-links a:not(.btn) { color: #a9a3b8; }
+.nav.on-dark .btn-dark { background: #f3f0f8; color: var(--ink); }
+@media (hover: hover) and (pointer: fine) { .nav.on-dark .nav-links a:not(.btn):hover { color: #fff; } }
 
 /* Editor explainer (in Features) */
 .showcase { position: relative; margin-top: 56px; text-align: center; }
@@ -560,8 +598,14 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
   .ed-tl .lab { display: none; }
   .ed-tl { grid-template-columns: 1fr; }
   .ed-tl .tracks { grid-column: 1; }
-  .hero-video { margin-top: 40px; padding-bottom: 64px; }
-  .hv-frame { border-radius: 12px; box-shadow: 0 0 0 1px rgba(17,16,22,0.08), 0 30px 60px -30px rgba(30, 10, 50, 0.5); }
+  /* Phones: no pinning or growth, just the framed video */
+  .stage-scroll { height: auto; width: auto; margin: 40px 0 0; padding: 0 16px 64px; }
+  .stage-sticky { position: static; height: auto; overflow: visible; }
+  .stage-dim { display: none; }
+  .stage { width: 100%; border-radius: 12px; transform: none !important; }
+  .stage-ui { left: 8px; right: 8px; bottom: 8px; padding: 5px 10px 5px 5px; }
+  .sp { width: 26px; height: 26px; }
+  .stage-time { display: none; }
   .made-with { font-size: 12.5px; }
   .sec { padding: 80px 0; }
   .cells { grid-template-columns: 1fr; }
@@ -595,6 +639,9 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
   .a-speed .ph { transform: translateX(50%); }
   .canvas, .rec, .bgs i, .tabs-hl.ready { transition-duration: 0ms; }
   .js .reveal { transform: none; filter: none; transition: opacity 300ms ease; }
+  .stage-scroll { height: auto; padding-bottom: 96px; }
+  .stage-sticky { position: static; height: auto; }
+  .stage { transform: none !important; }
 }
 </style>
 <script>document.documentElement.classList.add("js");</script>
@@ -639,19 +686,30 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
           macOS <small>preview</small></a>
       </div>
       <p class="micro enter d5">Free · No account · Runs entirely on your computer</p>
+    </div>
+  </section>
 
-      <div class="hero-video enter d6">
-        <div class="hv-glow" aria-hidden="true"></div>
-        <div class="hv-frame">
+  <div class="stage-scroll" id="stageScroll">
+    <div class="stage-sticky">
+      <div class="stage-dim" id="stageDim" aria-hidden="true"></div>
+      <div class="stage-wrap enter d6">
+        <div class="stage" id="stage">
           <video id="heroVideo" autoplay muted loop playsinline preload="auto" poster="/assets/hero-poster.jpg" aria-label="A screen recording made with Demodrop: a new task is created, dragged to Done and the board is published, with automatic zooms on each click.">
             <source src="/assets/hero.mp4" type="video/mp4">
           </video>
+          <div class="stage-ui">
+            <button class="sp" id="stagePlay" type="button" aria-label="Pause video">
+              <svg class="i-pause" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><rect x="3" y="2" width="2.8" height="10" rx="1"/><rect x="8.2" y="2" width="2.8" height="10" rx="1"/></svg>
+              <svg class="i-play" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><path d="M4 2.2v9.6a.6.6 0 0 0 .9.5l7.6-4.8a.6.6 0 0 0 0-1L4.9 1.7a.6.6 0 0 0-.9.5Z"/></svg>
+            </button>
+            <div class="stage-bar" aria-hidden="true"><i id="stageProg"></i></div>
+            <span class="stage-time" id="stageTime">0:00 / 0:20</span>
+          </div>
         </div>
         <p class="made-with"><img src="/assets/icon.png" alt="" width="16" height="16">Made with Demodrop. Recorded, zoomed and exported in the app, with no other editing.</p>
       </div>
-      </div>
     </div>
-  </section>
+  </div>
 
   <div class="rule"></div>
 
@@ -1038,20 +1096,71 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
   getComputedStyle(hl).clipPath;
   hl.classList.add("ready");
 
-  // Hero video: honour reduced motion, and only play while it's on screen.
+  // Hero stage: the video grows from a tilted card to near full screen while the page dims around it.
   var hv = document.getElementById("heroVideo");
-  if (hv) {
-    if (reduce) {
-      hv.removeAttribute("autoplay");
-      hv.pause();
-      hv.controls = true;
-    } else if ("IntersectionObserver" in window) {
-      new IntersectionObserver(function (es) {
-        if (es[0].isIntersecting) { var p = hv.play(); if (p && p.catch) p.catch(function () {}); }
-        else hv.pause();
-      }, { threshold: 0.2 }).observe(hv);
-    }
+  var stage = document.getElementById("stage");
+  var scroller = document.getElementById("stageScroll");
+  var dim = document.getElementById("stageDim");
+  var playBtn = document.getElementById("stagePlay");
+  var prog = document.getElementById("stageProg");
+  var timeEl = document.getElementById("stageTime");
+  var userPaused = reduce;
+
+  function play() { var p = hv.play(); if (p && p.catch) p.catch(function () {}); }
+  function syncPaused() {
+    stage.classList.toggle("paused", hv.paused);
+    playBtn.setAttribute("aria-label", hv.paused ? "Play video" : "Pause video");
   }
+  if (reduce) { hv.removeAttribute("autoplay"); hv.pause(); }
+  hv.addEventListener("play", syncPaused);
+  hv.addEventListener("pause", syncPaused);
+  function toggle() { if (hv.paused) { userPaused = false; play(); } else { userPaused = true; hv.pause(); } }
+  playBtn.addEventListener("click", toggle);
+  hv.addEventListener("click", toggle);
+  syncPaused();
+
+  // Only play while on screen (and not paused by the visitor).
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (es) {
+      if (es[0].isIntersecting) { if (!userPaused) play(); } else hv.pause();
+    }, { threshold: 0.15 }).observe(stage);
+  }
+
+  // Progress bar and time, drawn per frame only while playing.
+  function fmt(s) { s = Math.max(0, Math.floor(s)); return Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2); }
+  function tick() {
+    if (hv.duration) {
+      prog.style.transform = "scaleX(" + (hv.currentTime / hv.duration) + ")";
+      timeEl.textContent = fmt(hv.currentTime) + " / " + fmt(hv.duration);
+    }
+    if (!hv.paused) requestAnimationFrame(tick);
+  }
+  hv.addEventListener("play", function () { requestAnimationFrame(tick); });
+  hv.addEventListener("loadedmetadata", tick);
+
+  // Scroll-linked growth. Progress runs from "stage enters the viewport" to "pinned for a while".
+  // Scroll events already arrive at most once per frame, so update directly
+  // (a rAF gate can stall in background tabs and leave the stage stale).
+  var wide = matchMedia("(min-width: 721px)");
+  function clamp(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function update() {
+    if (reduce || !wide.matches) { stage.style.transform = ""; dim.style.opacity = 0; scroller.classList.remove("dark"); nav.classList.remove("on-dark"); return; }
+    var vh = innerHeight, top = scroller.getBoundingClientRect().top;
+    var p = clamp((vh * 0.9 - top) / (vh * 1.35));
+    var e = p * p * (3 - 2 * p);                       // smoothstep: eases in and out of the growth
+    stage.style.transform = "perspective(1800px) translateY(" + ((1 - e) * 5).toFixed(2) + "vh) rotateX(" + ((1 - e) * 14).toFixed(2) + "deg) scale(" + (0.76 + 0.24 * e).toFixed(4) + ")";
+    // Dim only once pinned (top <= 0), so the dark layer's edge is never on screen.
+    var d = clamp(-top / (vh * 0.35));
+    d = d * d * (3 - 2 * d);
+    dim.style.opacity = d.toFixed(3);
+    scroller.classList.toggle("dark", d > 0.5);
+    // Keep the nav dark only while the dimmed stage is behind it.
+    var below = scroller.getBoundingClientRect().bottom;
+    nav.classList.toggle("on-dark", d > 0.5 && below > 80);
+  }
+  addEventListener("scroll", update, { passive: true });
+  addEventListener("resize", update);
+  update();
 
   // Reveal on scroll.
   var els = document.querySelectorAll(".reveal");
