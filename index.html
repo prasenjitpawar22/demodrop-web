@@ -163,7 +163,19 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 @keyframes rise { from { opacity: 0; transform: translateY(14px); filter: blur(6px); } to { opacity: 1; transform: none; filter: blur(0); } }
 
 /* ---------- Showcase: tabs + editor ---------- */
-.showcase { position: relative; margin-top: 64px; padding-bottom: 88px; }
+/* ---------- Hero video (made with Demodrop) ---------- */
+.hero-video { position: relative; margin: 60px auto 0; padding-bottom: 96px; max-width: 1080px; }
+.hv-glow { position: absolute; inset: 12% 6% 22%; border-radius: 48px; background: var(--grad); filter: blur(70px); opacity: 0.35; }
+.hv-frame {
+  position: relative; border-radius: 18px; overflow: hidden; aspect-ratio: 16 / 9; background: #1b1530;
+  box-shadow: 0 0 0 1px rgba(17,16,22,0.08), 0 0 0 7px rgba(255,255,255,0.6), 0 0 0 8px var(--line), 0 50px 100px -40px rgba(30, 10, 50, 0.55);
+}
+.hv-frame video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.made-with { margin: 22px 0 0; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+.made-with img { width: 16px; height: 16px; }
+
+/* Editor explainer (in Features) */
+.showcase { position: relative; margin-top: 56px; text-align: center; }
 .tabs {
   position: relative; display: inline-flex; gap: 2px; padding: 4px; border-radius: 999px;
   background: rgba(255,255,255,0.75); box-shadow: 0 0 0 1px var(--line), 0 1px 2px rgba(17,16,22,0.04);
@@ -548,7 +560,9 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
   .ed-tl .lab { display: none; }
   .ed-tl { grid-template-columns: 1fr; }
   .ed-tl .tracks { grid-column: 1; }
-  .showcase { padding-bottom: 64px; }
+  .hero-video { margin-top: 40px; padding-bottom: 64px; }
+  .hv-frame { border-radius: 12px; box-shadow: 0 0 0 1px rgba(17,16,22,0.08), 0 30px 60px -30px rgba(30, 10, 50, 0.5); }
+  .made-with { font-size: 12.5px; }
   .sec { padding: 80px 0; }
   .cells { grid-template-columns: 1fr; }
   .cell { min-height: 0; }
@@ -626,7 +640,32 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
       </div>
       <p class="micro enter d5">Free · No account · Runs entirely on your computer</p>
 
-      <div class="showcase enter d6">
+      <div class="hero-video enter d6">
+        <div class="hv-glow" aria-hidden="true"></div>
+        <div class="hv-frame">
+          <video id="heroVideo" autoplay muted loop playsinline preload="auto" poster="/assets/hero-poster.jpg" aria-label="A screen recording made with Demodrop: a new task is created, dragged to Done and the board is published, with automatic zooms on each click.">
+            <source src="/assets/hero.mp4" type="video/mp4">
+          </video>
+        </div>
+        <p class="made-with"><img src="/assets/icon.png" alt="" width="16" height="16">Made with Demodrop. Recorded, zoomed and exported in the app, with no other editing.</p>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section class="sec" id="features">
+    <div class="inner">
+      <div class="sec-head">
+        <div class="reveal">
+          <span class="eyebrow"><i></i>Features</span>
+          <h2>Every detail of a good demo, <span class="serif">handled.</span></h2>
+        </div>
+        <p class="reveal" style="--d:80ms">Record once and use your app the way you normally would. Demodrop takes care of the motion, the framing and the finishing touches, so the video looks deliberate instead of just captured.</p>
+      </div>
+
+      <div class="showcase reveal" style="--d:120ms">
         <div class="tabs auto" role="tablist" aria-label="See what Demodrop does">
           <div class="tabs-hl" aria-hidden="true"></div>
           <button class="tab" role="tab" aria-selected="true" data-mode="zoom" data-dur="7000">
@@ -722,21 +761,6 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="rule"></div>
-
-  <section class="sec" id="features">
-    <div class="inner">
-      <div class="sec-head">
-        <div class="reveal">
-          <span class="eyebrow"><i></i>Features</span>
-          <h2>Every detail of a good demo, <span class="serif">handled.</span></h2>
-        </div>
-        <p class="reveal" style="--d:80ms">Record once and use your app the way you normally would. Demodrop takes care of the motion, the framing and the finishing touches, so the video looks deliberate instead of just captured.</p>
-      </div>
 
       <div class="cells">
         <article class="cell reveal">
@@ -1013,6 +1037,21 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
   // so the pill doesn't animate in from the left edge on load.
   getComputedStyle(hl).clipPath;
   hl.classList.add("ready");
+
+  // Hero video: honour reduced motion, and only play while it's on screen.
+  var hv = document.getElementById("heroVideo");
+  if (hv) {
+    if (reduce) {
+      hv.removeAttribute("autoplay");
+      hv.pause();
+      hv.controls = true;
+    } else if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (es) {
+        if (es[0].isIntersecting) { var p = hv.play(); if (p && p.catch) p.catch(function () {}); }
+        else hv.pause();
+      }, { threshold: 0.2 }).observe(hv);
+    }
+  }
 
   // Reveal on scroll.
   var els = document.querySelectorAll(".reveal");
