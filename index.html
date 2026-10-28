@@ -195,6 +195,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .sp .i-play { opacity: 0; transform: scale(0.7); }
 .stage.paused .sp .i-play { opacity: 1; transform: none; }
 .stage.paused .sp .i-pause { opacity: 0; transform: scale(0.7); }
+.snd[hidden] { display: none; }
+.snd .i-on { opacity: 0; transform: scale(0.7); }
+.stage.sound .snd .i-on { opacity: 1; transform: none; }
+.stage.sound .snd .i-off { opacity: 0; transform: scale(0.7); }
 .stage-bar { position: relative; flex: 1; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.18); overflow: hidden; }
 .stage-bar i { position: absolute; inset: 0; border-radius: 4px; background: #fff; transform-origin: left; transform: scaleX(0); }
 .stage-time { font: 500 12px/1 "Geist Mono", ui-monospace, monospace; color: rgba(255,255,255,0.75); font-variant-numeric: tabular-nums; }
@@ -458,13 +462,7 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
       <a class="badge enter" href="#download"><b>Free</b> Windows beta · macOS preview
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5"/></svg></a>
       <h1 class="enter d1">Screen recordings, <span class="serif grad-text">already edited.</span></h1>
-      <p class="lede enter d2"><strong>Demodrop</strong> is a free desktop app that records your screen and turns it into a polished demo video, <strong>made for posting on X</strong>. It zooms in on every click, draws a crisp cursor and frames your recording on a beautiful background automatically.</p>
-      <div class="chips enter d3" aria-label="Highlights">
-        <span class="chip"><i><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3M7 5v4M5 7h4"/></svg></i>Auto-zoom on clicks</span>
-        <span class="chip"><i><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 2v11l3-2.7 1.9 4.4 2-.9-1.9-4.3H12L3 2Z"/></svg></i>Crisp, smooth cursor</span>
-        <span class="chip"><i><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="12" height="12" rx="3"/><rect x="5" y="5" width="6" height="6" rx="1.2"/></svg></i>Gradient backgrounds</span>
-        <span class="chip"><i><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8m0 0L5 7m3 3 3-3M3 13h10"/></svg></i>MP4 &amp; GIF export</span>
-      </div>
+      <p class="lede enter d2">Record your screen. Demodrop adds the zooms, the cursor and the background for you.</p>
       <div class="cta-row enter d4" id="hero-cta">
         <a class="btn btn-dark" data-os="win" href="https://github.com/prasenjitpawar22/demodrop-releases/releases/latest/download/Demodrop-Setup.exe">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5 10.5 4.4v7.1H3V5.5Zm0 13 7.5 1.1v-7H3v5.9Zm8.4 1.2L21 21v-8.4h-9.6v7.1Zm0-15.4v7.2H21V3l-9.6 1.3Z"/></svg>
@@ -492,6 +490,10 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
             </button>
             <div class="stage-bar" aria-hidden="true"><i id="stageProg"></i></div>
             <span class="stage-time" id="stageTime">0:00 / 0:20</span>
+            <button class="sp snd" id="stageSound" type="button" aria-label="Turn sound on" hidden>
+              <svg class="i-off" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6h2.5l3.5-3v10l-3.5-3H2.5z" fill="currentColor"/><path d="m11 6 3.5 4M14.5 6 11 10"/></svg>
+              <svg class="i-on" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6h2.5l3.5-3v10l-3.5-3H2.5z" fill="currentColor"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5M12.8 3.6a6 6 0 0 1 0 8.8"/></svg>
+            </button>
           </div>
         </div>
         <p class="made-with"><img src="/assets/icon.png" alt="" width="16" height="16">Made with Demodrop. Recorded, zoomed and exported in the app, with no other editing.</p>
@@ -894,6 +896,21 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
   function toggle() { if (hv.paused) { userPaused = false; play(); } else { userPaused = true; hv.pause(); } }
   playBtn.addEventListener("click", toggle);
   hv.addEventListener("click", toggle);
+
+  // Sound: videos autoplay muted (browsers require it); the toggle appears only when the clip has an audio track.
+  var sndBtn = document.getElementById("stageSound");
+  function hasAudio(v) {
+    return v.mozHasAudio || (v.audioTracks && v.audioTracks.length > 0) || v.webkitAudioDecodedByteCount > 0 || v.hasAttribute("data-audio");
+  }
+  function checkAudio() { if (hasAudio(hv)) sndBtn.hidden = false; }
+  hv.addEventListener("loadeddata", checkAudio);
+  hv.addEventListener("timeupdate", function once() { checkAudio(); if (hv.currentTime > 1) hv.removeEventListener("timeupdate", once); });
+  sndBtn.addEventListener("click", function () {
+    hv.muted = !hv.muted;
+    stage.classList.toggle("sound", !hv.muted);
+    sndBtn.setAttribute("aria-label", hv.muted ? "Turn sound on" : "Turn sound off");
+    if (!hv.muted && hv.paused) { userPaused = false; play(); }
+  });
   syncPaused();
 
   // Only play while on screen (and not paused by the visitor).
@@ -938,6 +955,34 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
   addEventListener("scroll", update, { passive: true });
   addEventListener("resize", update);
   update();
+
+  // Parallax: layers drift at different speeds. Transform/opacity only, written directly.
+  // Off on phones and for reduced motion.
+  var heroInner = document.querySelector(".hero > .inner");
+  var layers = []
+    .concat([].slice.call(document.querySelectorAll(".ch-media .media, .card-media .media")).map(function (el) { return { el: el, kind: "media" }; }))
+    .concat([].slice.call(document.querySelectorAll(".ch-title")).map(function (el) { return { el: el, kind: "title" }; }))
+    .concat([].slice.call(document.querySelectorAll(".final img")).map(function (el) { return { el: el, kind: "float" }; }));
+  function parallax() {
+    var on = !reduce && wide.matches, vh = innerHeight;
+    // Hero copy recedes as the stage rises over it.
+    if (on && scrollY < vh * 1.2) {
+      heroInner.style.transform = "translateY(" + (scrollY * 0.32).toFixed(1) + "px)";
+      heroInner.style.opacity = Math.max(0, 1 - scrollY / (vh * 0.75)).toFixed(3);
+    } else if (!on) { heroInner.style.transform = ""; heroInner.style.opacity = ""; }
+    layers.forEach(function (l) {
+      if (!on) { l.el.style.transform = ""; return; }
+      var r = l.el.getBoundingClientRect();
+      var d = (r.top + r.height / 2 - vh / 2) / vh;      // -1 (above centre) … 1 (below)
+      if (d < -1.3 || d > 1.3) return;                   // off screen: leave as is
+      if (l.kind === "media") l.el.style.transform = "translateY(" + (d * -2.6).toFixed(2) + "%) scale(1.06)";
+      else if (l.kind === "title") l.el.style.transform = "translateY(" + (d * 36).toFixed(1) + "px)";
+      else l.el.style.transform = "translateY(" + (d * -70).toFixed(1) + "px) rotate(" + (d * -6).toFixed(2) + "deg)";
+    });
+  }
+  addEventListener("scroll", parallax, { passive: true });
+  addEventListener("resize", parallax);
+  parallax();
 
   // Reveal on scroll.
   var els = document.querySelectorAll(".reveal");
