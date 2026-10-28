@@ -11,96 +11,205 @@
   --bg: #fbfbfa; --panel: #ffffff; --side: #f4f4f2; --ink: #17161c; --ink-2: #3f3d48; --muted: #75727f; --faint: #a3a0ab;
   --line: rgba(23, 22, 28, 0.08); --line-2: rgba(23, 22, 28, 0.13);
   --brand: #5b5bd6; --brand-2: #4a48c7; --brand-soft: rgba(91, 91, 214, 0.1);
-  --green: #2f9e6b; --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --green: #2f9e6b; --amber: #e2a336; --red: #e5484d; --pink: #e46aa0; --teal: #12a594;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
 body {
-  font: 400 14px/1.5 "Inter", system-ui, sans-serif; color: var(--ink); background: var(--bg);
+  font: 400 13.5px/1.45 "Inter", system-ui, sans-serif; color: var(--ink); background: var(--bg);
   -webkit-font-smoothing: antialiased; overflow: hidden; user-select: none;
-  display: grid; grid-template-columns: 240px 1fr; grid-template-rows: 44px 1fr;
+  display: grid; grid-template-columns: 228px 1fr; grid-template-rows: 44px 1fr;
 }
 button { font: inherit; color: inherit; border: 0; background: none; padding: 0; cursor: pointer; }
-svg { display: block; }
+svg { display: block; flex: none; }
+img { display: block; }
 
-/* Title bar (drag region for the window) */
+/* Avatars: illustrated portraits, initials underneath as a fallback */
+.av { position: relative; width: 24px; height: 24px; border-radius: 50%; flex: none; overflow: hidden;
+  display: grid; place-items: center; font-size: 9.5px; font-weight: 600; color: #fff; box-shadow: 0 0 0 2px var(--panel); }
+.av img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.av.s { width: 20px; height: 20px; font-size: 8.5px; }
+.av.l { width: 30px; height: 30px; font-size: 11px; }
+.stack { display: flex; }
+.stack .av + .av { margin-left: -7px; }
+.stack .more { width: 24px; height: 24px; border-radius: 50%; margin-left: -7px; display: grid; place-items: center; font-size: 10px; font-weight: 600; color: var(--muted); background: #ecebef; box-shadow: 0 0 0 2px var(--panel); }
+
+/* Title bar (window drag region) */
 .titlebar { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; padding: 0 16px; background: var(--side); border-bottom: 1px solid var(--line); -webkit-app-region: drag; }
-.titlebar .crumb { font-size: 13px; color: var(--muted); }
+.titlebar .crumb { font-size: 12.5px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
 .titlebar .crumb b { color: var(--ink); font-weight: 500; }
+.titlebar .crumb i { font-style: normal; color: var(--faint); }
 
 /* Sidebar */
-.side { background: var(--side); border-right: 1px solid var(--line); padding: 14px 12px; display: flex; flex-direction: column; gap: 2px; }
-.ws { display: flex; align-items: center; gap: 10px; padding: 6px 8px 14px; font-weight: 600; font-size: 15px; }
-.ws .logo { width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(135deg, #7272ec, #4a48c7); display: grid; place-items: center; color: #fff; font-size: 13px; font-weight: 700; box-shadow: 0 1px 2px rgba(74,72,199,.4); }
-.search { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; margin-bottom: 10px; border-radius: 8px; background: var(--panel); box-shadow: 0 0 0 1px var(--line); color: var(--faint); font-size: 13px; }
-.search kbd { margin-left: auto; font: 500 11px "Inter"; color: var(--faint); }
-.nav { display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 10px; border-radius: 8px; color: var(--ink-2); font-size: 13.5px; }
-.nav svg { width: 16px; height: 16px; color: var(--muted); }
-.nav .n { margin-left: auto; font-size: 12px; color: var(--muted); }
+.side { background: var(--side); border-right: 1px solid var(--line); padding: 12px 10px; display: flex; flex-direction: column; gap: 1px; min-height: 0; }
+.ws { display: flex; align-items: center; gap: 9px; padding: 4px 8px 12px; font-weight: 600; font-size: 14px; }
+.ws .logo { width: 26px; height: 26px; border-radius: 8px; background: conic-gradient(from 210deg, #7b7bf0, #5b5bd6, #a974f0, #7b7bf0); display: grid; place-items: center; box-shadow: 0 1px 2px rgba(74,72,199,.4), inset 0 1px 0 rgba(255,255,255,.3); }
+.ws .logo svg { width: 14px; height: 14px; color: #fff; }
+.ws small { display: block; font-size: 11px; font-weight: 500; color: var(--faint); margin-top: -1px; }
+.ws .chev { margin-left: auto; color: var(--faint); width: 14px; height: 14px; }
+.search { display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 10px; margin-bottom: 8px; border-radius: 8px; background: var(--panel); box-shadow: 0 0 0 1px var(--line); color: var(--faint); font-size: 12.5px; }
+.search kbd { margin-left: auto; font: 500 10.5px "Inter"; color: var(--faint); padding: 1px 5px; border-radius: 4px; box-shadow: inset 0 0 0 1px var(--line-2); }
+.nav { display: flex; align-items: center; gap: 9px; height: 30px; padding: 0 10px; border-radius: 7px; color: var(--ink-2); font-size: 13px; }
+.nav svg { width: 15px; height: 15px; color: var(--muted); }
+.nav .n { margin-left: auto; font-size: 11px; font-weight: 600; color: #fff; background: var(--brand); min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; display: grid; place-items: center; }
+.nav .n.g { background: none; color: var(--faint); font-weight: 500; }
 .nav.on { background: var(--panel); box-shadow: 0 0 0 1px var(--line), 0 1px 2px rgba(0,0,0,.03); color: var(--ink); font-weight: 500; }
-.nav.on svg { color: var(--brand); }
-.side h6 { margin: 18px 10px 6px; font-size: 11.5px; font-weight: 500; color: var(--faint); }
-.dot { width: 8px; height: 8px; border-radius: 3px; }
+.nav .em { width: 18px; height: 18px; border-radius: 5px; display: grid; place-items: center; font-size: 11px; }
+.side h6 { margin: 14px 10px 4px; font-size: 11px; font-weight: 500; color: var(--faint); display: flex; justify-content: space-between; }
+.dot { width: 8px; height: 8px; border-radius: 3px; flex: none; }
+.side .grow { flex: 1; }
+.upgrade { margin: 0 2px 10px; padding: 12px; border-radius: 10px; background: linear-gradient(135deg, #eef0ff, #f6efff); box-shadow: inset 0 0 0 1px rgba(91,91,214,.15); font-size: 12px; color: var(--ink-2); }
+.upgrade b { display: block; font-size: 12.5px; color: var(--ink); margin-bottom: 2px; }
+.upgrade .bar { margin-top: 9px; height: 5px; border-radius: 3px; background: rgba(91,91,214,.15); overflow: hidden; }
+.upgrade .bar i { display: block; height: 100%; width: 72%; border-radius: 3px; background: linear-gradient(90deg, #7b7bf0, #5b5bd6); }
+.me { display: flex; align-items: center; gap: 9px; padding: 8px; border-radius: 9px; }
+.me .who { font-size: 12.5px; font-weight: 500; line-height: 1.25; }
+.me .who small { display: block; font-size: 11px; color: var(--faint); font-weight: 400; }
+.me .gear { margin-left: auto; width: 15px; height: 15px; color: var(--faint); }
+.me .av { box-shadow: 0 0 0 2px var(--side); }
+.online { position: relative; }
+.online::after { content: ""; position: absolute; right: -1px; bottom: -1px; width: 8px; height: 8px; border-radius: 50%; background: #30c48d; box-shadow: 0 0 0 2px var(--side); }
 
 /* Main */
-.main { display: flex; flex-direction: column; min-width: 0; }
-.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding: 26px 32px 18px; }
-.head h1 { margin: 0; font-size: 26px; letter-spacing: -0.02em; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-.head h1 .em { font-size: 22px; }
-.head p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
-.actions { display: flex; align-items: center; gap: 10px; }
-.avatars { display: flex; margin-right: 6px; }
-.av { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--bg); display: grid; place-items: center; font-size: 11px; font-weight: 600; color: #fff; }
-.avatars .av + .av { margin-left: -8px; }
-.btn { display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px; border-radius: 9px; font-weight: 500; font-size: 13.5px; transition: transform 160ms var(--ease-out), background-color 150ms ease, box-shadow 150ms ease; }
+.main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 20px 28px 12px; }
+.title { display: flex; align-items: center; gap: 12px; }
+.title .icon { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; font-size: 21px; background: linear-gradient(135deg, #fff1e6, #ffe2ec); box-shadow: inset 0 0 0 1px rgba(23,22,28,.06); }
+.title h1 { margin: 0; font-size: 22px; letter-spacing: -0.02em; font-weight: 650; display: flex; align-items: center; gap: 9px; }
+.title h1 .star { width: 16px; height: 16px; color: #f2b23c; }
+.status { height: 22px; padding: 0 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; color: #1d7a52; background: #e3f6ec; }
+.status i { width: 6px; height: 6px; border-radius: 50%; background: #2f9e6b; }
+.sub { margin-top: 3px; display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12.5px; }
+.sub .sep { width: 3px; height: 3px; border-radius: 50%; background: var(--faint); }
+.prog { display: inline-flex; align-items: center; gap: 7px; }
+.prog .track { width: 90px; height: 6px; border-radius: 3px; background: #ecebef; overflow: hidden; }
+.prog .track i { display: block; height: 100%; width: 62%; border-radius: 3px; background: linear-gradient(90deg, #7b7bf0, #5b5bd6); }
+.prog b { color: var(--ink-2); font-weight: 600; }
+.actions { display: flex; align-items: center; gap: 10px; padding-top: 4px; }
+.btn { display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 13px; border-radius: 9px; font-weight: 500; font-size: 13px; transition: transform 160ms var(--ease-out), background-color 150ms ease, box-shadow 150ms ease; }
 .btn:active { transform: scale(0.97); }
 .btn svg { width: 15px; height: 15px; }
 .btn-ghost { background: var(--panel); box-shadow: 0 0 0 1px var(--line-2), 0 1px 2px rgba(0,0,0,.04); }
 .btn-ghost:hover { background: #f7f7f6; }
 .btn-primary { color: #fff; background: var(--brand); box-shadow: 0 1px 0 rgba(255,255,255,.15) inset, 0 1px 2px rgba(74,72,199,.35), 0 4px 12px -4px rgba(74,72,199,.5); }
 .btn-primary:hover { background: var(--brand-2); }
+.btn-primary kbd { font: 600 10.5px "Inter"; padding: 1px 5px; border-radius: 4px; background: rgba(255,255,255,.18); }
+.icon-btn { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; color: var(--muted); position: relative; }
+.icon-btn svg { width: 17px; height: 17px; }
+.icon-btn .badge { position: absolute; top: 6px; right: 7px; width: 8px; height: 8px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 2px var(--bg); }
 
-.toolbar { display: flex; align-items: center; gap: 8px; padding: 0 32px 16px; border-bottom: 1px solid var(--line); }
+.toolbar { display: flex; align-items: center; gap: 8px; padding: 0 28px 12px; border-bottom: 1px solid var(--line); }
 .seg { display: inline-flex; padding: 3px; border-radius: 9px; background: var(--side); box-shadow: inset 0 0 0 1px var(--line); }
-.seg span { height: 26px; padding: 0 12px; display: grid; place-items: center; border-radius: 7px; font-size: 12.5px; color: var(--muted); }
+.seg span { height: 26px; padding: 0 11px; display: inline-flex; align-items: center; gap: 6px; border-radius: 7px; font-size: 12.5px; color: var(--muted); transition: background-color 150ms ease, color 150ms ease, box-shadow 150ms ease; }
+.seg span svg { width: 13px; height: 13px; }
 .seg span.on { background: var(--panel); color: var(--ink); font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 0 0 1px var(--line); }
-.chipf { height: 30px; padding: 0 10px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); box-shadow: inset 0 0 0 1px var(--line-2); }
+.chipf { height: 30px; padding: 0 10px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); box-shadow: inset 0 0 0 1px var(--line-2); transition: background-color 150ms ease, color 150ms ease, box-shadow 150ms ease; }
 .chipf svg { width: 13px; height: 13px; }
+.chipf .av { width: 16px; height: 16px; box-shadow: none; }
+.chipf.on { background: var(--brand-soft); color: var(--brand-2); box-shadow: inset 0 0 0 1px rgba(91,91,214,.45); }
+.toolbar .live { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--faint); }
+.toolbar .live i { width: 7px; height: 7px; border-radius: 50%; background: #30c48d; box-shadow: 0 0 0 3px rgba(48,196,141,.18); }
 
 /* Board */
-.board { flex: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; padding: 20px 32px 28px; min-height: 0; }
-.col { display: flex; flex-direction: column; min-height: 0; border-radius: 14px; background: rgba(23,22,28,0.025); box-shadow: inset 0 0 0 1px var(--line); padding: 12px; transition: background-color 200ms ease, box-shadow 200ms ease; }
+.board { flex: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; padding: 16px 28px 0; min-height: 0; }
+.col { display: flex; flex-direction: column; min-height: 0; border-radius: 14px 14px 0 0; background: rgba(23,22,28,0.025); box-shadow: inset 0 0 0 1px var(--line); padding: 10px 10px 0; transition: background-color 200ms ease, box-shadow 200ms ease; overflow: hidden; }
 .col.over { background: var(--brand-soft); box-shadow: inset 0 0 0 1.5px rgba(91,91,214,.45); }
-.col-h { display: flex; align-items: center; gap: 8px; padding: 2px 4px 12px; font-size: 13px; font-weight: 600; }
+.col-h { display: flex; align-items: center; gap: 8px; padding: 2px 4px 10px; font-size: 12.5px; font-weight: 600; }
 .col-h .ic { width: 14px; height: 14px; border-radius: 50%; border: 1.8px solid currentColor; }
 .col[data-col="todo"] .col-h .ic { color: #a3a0ab; }
-.col[data-col="doing"] .col-h .ic { color: #e2a336; border-style: solid; background: conic-gradient(#e2a336 0 50%, transparent 0); }
+.col[data-col="doing"] .col-h .ic { color: var(--amber); background: conic-gradient(var(--amber) 0 50%, transparent 0); }
 .col[data-col="done"] .col-h .ic { color: var(--green); background: var(--green); }
 .col-h .count { color: var(--faint); font-weight: 500; }
-.col-h .plus { margin-left: auto; width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; color: var(--faint); }
-.cards { display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 40px; }
+.col-h .plus { margin-left: auto; width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; color: var(--faint); font-size: 15px; }
+.cards { display: flex; flex-direction: column; gap: 9px; flex: 1; min-height: 40px; }
 
 .card {
-  background: var(--panel); border-radius: 11px; padding: 13px 14px 12px;
+  background: var(--panel); border-radius: 11px; padding: 11px 12px;
   box-shadow: 0 0 0 1px var(--line), 0 1px 2px rgba(0,0,0,.04);
-  cursor: grab; touch-action: none;
+  cursor: grab; touch-action: none; flex: none;
   transition: box-shadow 150ms ease;
 }
 .card:hover { box-shadow: 0 0 0 1px var(--line-2), 0 2px 6px rgba(0,0,0,.05); }
-.card .top { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--faint); font-weight: 500; }
+.card .top { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--faint); font-weight: 500; }
+.pri { display: inline-flex; gap: 1.5px; align-items: flex-end; height: 10px; }
+.pri i { width: 2.5px; border-radius: 1px; background: currentColor; }
+.pri i:nth-child(1) { height: 4px; } .pri i:nth-child(2) { height: 7px; } .pri i:nth-child(3) { height: 10px; }
+.pri.high { color: var(--ink-2); } .pri.high i:nth-child(3) { opacity: .25; }
+.pri.urgent { color: #fff; background: var(--red); border-radius: 3px; width: 14px; height: 14px !important; align-items: center !important; justify-content: center; font-size: 10px; font-weight: 800; }
 .card .top .chk { margin-left: auto; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; background: var(--green); color: #fff; transform: scale(0); opacity: 0; transition: transform 350ms cubic-bezier(.34,1.56,.64,1), opacity 150ms ease; }
 .card .top .chk svg { width: 11px; height: 11px; }
 .card.is-done .top .chk { transform: scale(1); opacity: 1; }
-.card .t { margin-top: 5px; font-size: 14px; font-weight: 500; color: var(--ink); line-height: 1.4; transition: color 250ms ease; }
+.card .t { margin-top: 4px; font-size: 13.5px; font-weight: 550; color: var(--ink); line-height: 1.35; transition: color 250ms ease; }
 .card.is-done .t { color: var(--muted); }
-.card .meta { margin-top: 11px; display: flex; align-items: center; gap: 6px; }
-.tag { height: 22px; padding: 0 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line-2); }
-.tag i { width: 7px; height: 7px; border-radius: 50%; }
-.due { font-size: 11.5px; color: var(--muted); display: inline-flex; align-items: center; gap: 4px; }
+.card .meta { margin-top: 10px; display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+.tag { height: 21px; padding: 0 7px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+.tag i { width: 6px; height: 6px; border-radius: 50%; }
+.tag.mk { color: #9a5b00; background: #fff3dc; } .tag.mk i { background: var(--amber); }
+.tag.ds { color: #b03a74; background: #fde8f1; } .tag.ds i { background: var(--pink); }
+.tag.en { color: #3f3db8; background: #eceafe; } .tag.en i { background: var(--brand); }
+.tag.dc { color: #1d7a52; background: #e3f6ec; } .tag.dc i { background: var(--green); }
+.stat { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; color: var(--faint); font-weight: 500; }
+.stat svg { width: 12px; height: 12px; }
+.due { font-size: 11px; color: var(--muted); display: inline-flex; align-items: center; gap: 4px; font-weight: 500; }
 .due svg { width: 12px; height: 12px; }
-.card .meta .av { margin-left: auto; width: 22px; height: 22px; border: 0; font-size: 9.5px; }
+.due.soon { color: #c4501e; }
+.card .meta .people { margin-left: auto; }
+.card .sub { margin: 9px 0 0; display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--muted); }
+.card .sub .track { flex: 1; height: 4px; border-radius: 2px; background: #ecebef; overflow: hidden; }
+.card .sub .track i { display: block; height: 100%; border-radius: 2px; background: var(--brand); }
+.pr { display: inline-flex; align-items: center; gap: 4px; height: 21px; padding: 0 7px; border-radius: 6px; font-size: 11px; font-weight: 500; color: #6e3fd6; background: #f1ebff; }
+.pr svg { width: 11px; height: 11px; }
 
-.card.placeholder { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(91,91,214,.35); border-radius: 11px; }
+/* List view: the same tasks, grouped by status */
+.board, .listview { transition: opacity 220ms ease, transform 280ms var(--ease-out); }
+.view-out { opacity: 0; transform: translateY(6px); pointer-events: none; }
+.listview { flex: 1; min-height: 0; overflow: hidden; padding: 10px 28px 0; display: flex; flex-direction: column; gap: 14px; }
+.listview[hidden] { display: none; }
+.lgroup { border-radius: 12px; background: var(--panel); box-shadow: 0 0 0 1px var(--line), 0 1px 2px rgba(0,0,0,.03); overflow: hidden; flex: none; }
+.lgroup-h { display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 14px; font-size: 12.5px; font-weight: 600; background: rgba(23,22,28,0.025); border-bottom: 1px solid var(--line); }
+.lgroup-h .ic { width: 14px; height: 14px; border-radius: 50%; border: 1.8px solid currentColor; }
+.lgroup-h[data-col="todo"] .ic { color: #a3a0ab; }
+.lgroup-h[data-col="doing"] .ic { color: var(--amber); background: conic-gradient(var(--amber) 0 50%, transparent 0); }
+.lgroup-h[data-col="done"] .ic { color: var(--green); background: var(--green); }
+.lgroup-h .count { color: var(--faint); font-weight: 500; }
+.lrow { display: grid; grid-template-columns: 20px 78px minmax(0, 1fr) auto 82px 112px 58px; align-items: center; gap: 12px; height: 42px; padding: 0 14px; border-bottom: 1px solid var(--line); font-size: 13px; transition: background-color 150ms ease; }
+.lrow:last-child { border-bottom: 0; }
+.lrow:hover { background: #fafaf9; }
+.lrow .box { width: 17px; height: 17px; border-radius: 5px; box-shadow: inset 0 0 0 1.5px var(--line-2); display: grid; place-items: center; cursor: pointer; color: #fff; transition: background-color 150ms ease, box-shadow 150ms ease, transform 160ms var(--ease-out); }
+.lrow .box:active { transform: scale(0.88); }
+.lrow .box svg { width: 11px; height: 11px; opacity: 0; transform: scale(0.5); transition: opacity 150ms ease, transform 250ms cubic-bezier(.34,1.56,.64,1); }
+.lrow.done .box { background: var(--green); box-shadow: none; }
+.lrow.done .box svg { opacity: 1; transform: none; }
+.lrow .id { font-size: 11.5px; color: var(--faint); font-weight: 500; display: flex; align-items: center; gap: 6px; }
+.lrow .title { font-weight: 550; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 200ms ease; }
+.lrow.done .title { color: var(--muted); text-decoration: line-through; text-decoration-color: rgba(23,22,28,.25); }
+.lrow .people { justify-self: end; }
+.lrow .stats { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.lrow .id { white-space: nowrap; }
+.lrow-in { animation: rowIn 380ms var(--ease-out) both; }
+@keyframes rowIn { from { opacity: 0; transform: translateY(-6px); background: var(--brand-soft); } to { opacity: 1; transform: none; } }
+
+/* Card covers (drawn, no image files) */
+.cover { height: 84px; margin: -3px -4px 10px; border-radius: 8px; position: relative; overflow: hidden; }
+.cover.video { background: radial-gradient(120% 120% at 0% 0%, #3d3b8e, transparent 60%), linear-gradient(135deg, #1d1c2e, #2b2350); }
+.cover.video .play { position: absolute; left: 50%; top: 50%; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; background: rgba(255,255,255,.95); display: grid; place-items: center; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+.cover.video .play svg { width: 11px; height: 11px; color: #2b2350; margin-left: 2px; }
+.cover.video .wave { position: absolute; left: 10px; right: 10px; bottom: 9px; display: flex; align-items: flex-end; gap: 2px; height: 14px; }
+.cover.video .wave i { flex: 1; border-radius: 1px; background: rgba(255,255,255,.35); }
+.cover.video .len { position: absolute; right: 8px; top: 8px; font-size: 10px; font-weight: 600; color: #fff; background: rgba(0,0,0,.4); padding: 1px 5px; border-radius: 4px; }
+.cover.screens { background: linear-gradient(135deg, #efeaff, #ffe9f2); display: flex; align-items: flex-end; justify-content: center; gap: 8px; padding-top: 12px; }
+.cover.screens .ph { width: 44px; height: 74px; border-radius: 8px 8px 0 0; background: #fff; box-shadow: 0 0 0 1px rgba(23,22,28,.06), 0 6px 14px -6px rgba(60,30,120,.35); padding: 7px 5px; display: flex; flex-direction: column; gap: 4px; }
+.cover.screens .ph:nth-child(2) { height: 82px; }
+.cover.screens .ph i { display: block; height: 4px; border-radius: 2px; background: #ecebef; }
+.cover.screens .ph i.a { height: 16px; border-radius: 4px; background: linear-gradient(135deg, #7b7bf0, #a974f0); }
+.cover.screens .ph i.b { width: 70%; }
+.cover.screens .ph i.c { margin-top: auto; height: 8px; border-radius: 3px; background: var(--brand); }
+.cover.art { background: conic-gradient(from 200deg at 50% 60%, #ffcf8a, #ff8fb1, #9f8cff, #6fd3ff, #ffcf8a); display: grid; place-items: center; }
+.cover.art .app { width: 46px; height: 46px; border-radius: 13px; background: rgba(255,255,255,.92); box-shadow: 0 8px 18px -6px rgba(60,30,120,.45); display: grid; place-items: center; }
+.cover.art .app svg { width: 24px; height: 24px; color: var(--brand); }
+
+.card.placeholder { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(91,91,214,.35); }
 .card.placeholder > * { visibility: hidden; }
 .ghost { position: fixed; left: 0; top: 0; z-index: 50; pointer-events: none; margin: 0; cursor: grabbing;
   box-shadow: 0 0 0 1px var(--line-2), 0 18px 40px -12px rgba(23,22,28,.35), 0 4px 10px rgba(23,22,28,.08); }
@@ -109,11 +218,11 @@ svg { display: block; }
 @keyframes cardIn { from { opacity: 0; transform: translateY(-8px) scale(0.97); } to { opacity: 1; transform: none; } }
 
 /* Composer */
-.composer { background: var(--panel); border-radius: 11px; padding: 12px 14px; box-shadow: 0 0 0 1.5px var(--brand), 0 0 0 5px rgba(91,91,214,.12); animation: cardIn 300ms var(--ease-out) both; }
-.composer input { width: 100%; border: 0; outline: 0; font: 500 14px "Inter"; color: var(--ink); background: transparent; padding: 2px 0; caret-color: var(--brand); }
+.composer { background: var(--panel); border-radius: 11px; padding: 11px 12px; box-shadow: 0 0 0 1.5px var(--brand), 0 0 0 5px rgba(91,91,214,.12); animation: cardIn 300ms var(--ease-out) both; flex: none; }
+.composer input { width: 100%; border: 0; outline: 0; font: 550 13.5px "Inter"; color: var(--ink); background: transparent; padding: 2px 0; caret-color: var(--brand); }
 .composer input::placeholder { color: var(--faint); font-weight: 400; }
-.composer .hint { margin-top: 10px; display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--faint); }
-.composer kbd { font: 500 11px "Inter"; padding: 2px 6px; border-radius: 5px; box-shadow: inset 0 0 0 1px var(--line-2); color: var(--muted); }
+.composer .hint { margin-top: 9px; display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--faint); }
+.composer kbd { font: 500 10.5px "Inter"; padding: 2px 6px; border-radius: 5px; box-shadow: inset 0 0 0 1px var(--line-2); color: var(--muted); }
 
 /* Share popover */
 .share-wrap { position: relative; }
@@ -125,14 +234,14 @@ svg { display: block; }
   transition: opacity 180ms ease, transform 220ms var(--ease-out);
 }
 .pop.open { opacity: 1; transform: none; pointer-events: auto; }
-.pop h3 { margin: 0; font-size: 15px; font-weight: 600; }
-.pop .sub { margin: 2px 0 14px; font-size: 12.5px; color: var(--muted); }
+.pop h3 { margin: 0; font-size: 14.5px; font-weight: 600; }
+.pop .psub { margin: 2px 0 14px; font-size: 12.5px; color: var(--muted); }
 .invite { display: flex; gap: 8px; }
-.invite .in { flex: 1; height: 34px; border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line-2); display: flex; align-items: center; padding: 0 10px; font-size: 13px; color: var(--faint); }
-.people { margin-top: 14px; display: grid; gap: 10px; }
-.person { display: flex; align-items: center; gap: 10px; font-size: 13px; }
-.person .av { width: 26px; height: 26px; border: 0; font-size: 10px; }
-.person .role { color: var(--muted); margin-left: auto; font-size: 12.5px; }
+.invite .in { flex: 1; height: 34px; border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line-2); display: flex; align-items: center; padding: 0 10px; font-size: 12.5px; color: var(--faint); }
+.people-list { margin-top: 14px; display: grid; gap: 10px; }
+.person { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; }
+.person .who small { display: block; font-size: 11.5px; color: var(--faint); font-weight: 400; line-height: 1.3; }
+.person .role { color: var(--muted); margin-left: auto; font-size: 12.5px; font-weight: 400; }
 .pub { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 12px; }
 .pub .txt b { display: block; font-size: 13px; font-weight: 600; }
 .pub .txt span { font-size: 12px; color: var(--muted); }
@@ -144,8 +253,8 @@ svg { display: block; }
 
 /* Toast */
 .toast {
-  position: fixed; right: 28px; bottom: 28px; z-index: 60; width: 340px;
-  display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 14px;
+  position: fixed; right: 24px; bottom: 24px; z-index: 60; width: 340px;
+  display: flex; align-items: center; gap: 12px; padding: 13px 15px; border-radius: 14px;
   background: #17161c; color: #fff; box-shadow: 0 20px 40px -12px rgba(23,22,28,.45);
   transform: translateY(calc(100% + 40px)); opacity: 0;
   transition: transform 450ms var(--ease-out), opacity 250ms ease;
@@ -153,48 +262,72 @@ svg { display: block; }
 .toast.show { transform: none; opacity: 1; }
 .toast .ok { width: 30px; height: 30px; border-radius: 50%; background: var(--green); display: grid; place-items: center; flex: none; }
 .toast .ok svg { width: 16px; height: 16px; }
-.toast b { display: block; font-size: 14px; font-weight: 600; }
-.toast span { font-size: 12.5px; color: #b5b2c0; }
+.toast b { display: block; font-size: 13.5px; font-weight: 600; }
+.toast span { font-size: 12px; color: #b5b2c0; }
 .toast .copy { margin-left: auto; height: 30px; padding: 0 12px; border-radius: 8px; background: rgba(255,255,255,.1); font-size: 12.5px; font-weight: 500; }
 </style>
 </head>
 <body>
-<div class="titlebar"><span class="crumb">Acme / Projects / <b>Launch week</b></span></div>
+<div class="titlebar"><span class="crumb">Acme <i>/</i> Projects <i>/</i> <b>Launch week</b></span></div>
 
 <aside class="side">
-  <div class="ws"><span class="logo">A</span>Acme</div>
+  <div class="ws">
+    <span class="logo"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5 14.5 13H1.5L8 1.5Zm0 4.2L5 11h6L8 5.7Z"/></svg></span>
+    <div>Acme Inc<small>Pro workspace</small></div>
+    <svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 6.5 3-3 3 3M5 9.5l3 3 3-3"/></svg>
+  </div>
   <div class="search"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg>Search<kbd>Ctrl K</kbd></div>
-  <div class="nav"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 9.5h3.2l1 2h3.6l1-2H14M2 9.5 4 3h8l2 6.5V13H2V9.5Z" stroke-linejoin="round"/></svg>Inbox<span class="n">3</span></div>
-  <div class="nav"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.5"/><path d="m5.8 8 1.5 1.5L10.4 6.4" stroke-linecap="round" stroke-linejoin="round"/></svg>My tasks</div>
-  <div class="nav on"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2.5" width="12" height="11" rx="2"/><path d="M6 2.5v11M10 2.5v11"/></svg>Projects</div>
+  <div class="nav"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M2.5 7 8 2.5 13.5 7v6.5h-11V7Z"/><path d="M6.5 13.5V10h3v3.5"/></svg>Home</div>
+  <div class="nav"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 9.5h3.2l1 2h3.6l1-2H14M2 9.5 4 3h8l2 6.5V13H2V9.5Z" stroke-linejoin="round"/></svg>Inbox<span class="n">4</span></div>
+  <div class="nav"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.5"/><path d="m5.8 8 1.5 1.5L10.4 6.4" stroke-linecap="round" stroke-linejoin="round"/></svg>My tasks<span class="n g">12</span></div>
   <div class="nav"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" stroke-linecap="round"/></svg>Calendar</div>
+  <h6>Favorites</h6>
+  <div class="nav on"><span class="em" style="background:#ffe9e0">🚀</span>Launch week</div>
+  <div class="nav"><span class="em" style="background:#f1ebff">🎨</span>Brand refresh</div>
+  <div class="nav"><span class="em" style="background:#e3f6ec">📱</span>Mobile app 3.0</div>
   <h6>Teams</h6>
-  <div class="nav"><span class="dot" style="background:#e46aa0"></span>Design</div>
-  <div class="nav"><span class="dot" style="background:#5b5bd6"></span>Engineering</div>
-  <div class="nav"><span class="dot" style="background:#e2a336"></span>Marketing</div>
+  <div class="nav"><span class="dot" style="background:var(--pink)"></span>Design<span class="n g">8</span></div>
+  <div class="nav"><span class="dot" style="background:var(--brand)"></span>Engineering<span class="n g">21</span></div>
+  <div class="nav"><span class="dot" style="background:var(--amber)"></span>Marketing<span class="n g">5</span></div>
+  <div class="grow"></div>
+  <div class="upgrade"><b>Launch week · 62%</b>14 of 23 tasks done<div class="bar"><i></i></div></div>
+  <div class="me">
+    <span class="av l online" data-p="maya"></span>
+    <div class="who">Maya Reyes<small>maya.reyes@acme.co</small></div>
+    <svg class="gear" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.6M8 12.6v1.6M14.2 8h-1.6M3.4 8H1.8M12.4 3.6l-1.1 1.1M4.7 11.3l-1.1 1.1M12.4 12.4l-1.1-1.1M4.7 4.7 3.6 3.6" stroke-linecap="round"/></svg>
+  </div>
 </aside>
 
 <main class="main">
   <div class="head">
     <div>
-      <h1><span class="em">🚀</span>Launch week</h1>
-      <p>Everything we need to ship v2.0 by Friday.</p>
+      <div class="title">
+        <span class="icon">🚀</span>
+        <div>
+          <h1>Launch week <svg class="star" viewBox="0 0 16 16" fill="currentColor"><path d="m8 1.6 1.9 4 4.4.5-3.3 3 .9 4.3L8 11.2l-3.9 2.2.9-4.3-3.3-3 4.4-.5L8 1.6Z"/></svg><span class="status"><i></i>On track</span></h1>
+          <div class="sub">
+            <span>Everything we need to ship v2.0</span><span class="sep"></span>
+            <span class="prog"><span class="track"><i></i></span><b>62%</b></span><span class="sep"></span>
+            <span>Due Fri, Oct 31</span>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="actions">
-      <div class="avatars">
-        <span class="av" style="background:#e46aa0">MR</span>
-        <span class="av" style="background:#5b5bd6">JK</span>
-        <span class="av" style="background:#2f9e6b">SL</span>
+      <span class="icon-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5a4 4 0 0 1 8 0c0 3.5 1.5 4.5 1.5 4.5h-11S4 10 4 6.5ZM6.5 13.5a1.6 1.6 0 0 0 3 0"/></svg><span class="badge"></span></span>
+      <div class="stack" style="margin-right:4px">
+        <span class="av" data-p="maya"></span><span class="av" data-p="jon"></span><span class="av" data-p="sara"></span><span class="av" data-p="alex"></span><span class="more">+3</span>
       </div>
       <div class="share-wrap">
         <button class="btn btn-ghost" id="shareBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10V2.5M5 5.5l3-3 3 3M3 9v3.5A1.5 1.5 0 0 0 4.5 14h7a1.5 1.5 0 0 0 1.5-1.5V9"/></svg>Share</button>
         <div class="pop" id="pop">
           <h3>Share Launch week</h3>
-          <p class="sub">Invite people or publish the board to the web.</p>
+          <p class="psub">Invite people or publish the board to the web.</p>
           <div class="invite"><div class="in">Add people by email…</div><button class="btn btn-ghost">Invite</button></div>
-          <div class="people">
-            <div class="person"><span class="av" style="background:#e46aa0">MR</span>Maya Reyes<span class="role">Owner</span></div>
-            <div class="person"><span class="av" style="background:#5b5bd6">JK</span>Jon Kim<span class="role">Can edit</span></div>
+          <div class="people-list">
+            <div class="person"><span class="av l" data-p="maya"></span><span class="who">Maya Reyes<small>maya.reyes@acme.co</small></span><span class="role">Owner</span></div>
+            <div class="person"><span class="av l" data-p="jon"></span><span class="who">Jon Kim<small>jon.kim@acme.co</small></span><span class="role">Can edit</span></div>
+            <div class="person"><span class="av l" data-p="sara"></span><span class="who">Sara Lin<small>sara.lin@acme.co</small></span><span class="role">Can view</span></div>
           </div>
           <div class="pub">
             <div class="txt"><b>Publish to web</b><span>Anyone with the link can view</span></div>
@@ -202,40 +335,98 @@ svg { display: block; }
           </div>
         </div>
       </div>
-      <button class="btn btn-primary" id="newBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>New task</button>
+      <button class="btn btn-primary" id="newBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>New task<kbd>C</kbd></button>
     </div>
   </div>
 
   <div class="toolbar">
-    <div class="seg"><span class="on">Board</span><span>List</span><span>Timeline</span></div>
+    <div class="seg">
+      <span class="on"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2.5" width="12" height="11" rx="2"/><path d="M6 2.5v11M10 2.5v11"/></svg>Board</span>
+      <span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M5.5 4h8M5.5 8h8M5.5 12h8M2.5 4h.01M2.5 8h.01M2.5 12h.01"/></svg>List</span>
+      <span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2.5 4h6M5 8h7.5M3.5 12h5"/></svg>Timeline</span>
+    </div>
     <span class="chipf"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M2.5 4h11M4.5 8h7M6.5 12h3"/></svg>Filter</span>
-    <span class="chipf">Due this week</span>
+    <span class="chipf"><span class="av" data-p="maya"></span>Assigned to me</span>
+    <span class="chipf"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="2.5" y="3" width="11" height="10.5" rx="2"/><path d="M2.5 6.5h11"/></svg>Due this week</span>
+    <span class="live"><i></i>Jon and Sara are here · updated just now</span>
   </div>
 
   <div class="board">
     <section class="col" data-col="todo">
-      <div class="col-h"><span class="ic"></span>Todo <span class="count">3</span><span class="plus">+</span></div>
+      <div class="col-h"><span class="ic"></span>Todo <span class="count">4</span><span class="plus">+</span></div>
       <div class="cards">
-        <article class="card"><div class="top">ACM-48<span class="chk"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5"/></svg></span></div><div class="t">Record the product demo</div><div class="meta"><span class="tag"><i style="background:#e2a336"></i>Marketing</span><span class="due">Thu</span><span class="av" style="background:#e46aa0">MR</span></div></article>
-        <article class="card"><div class="top">ACM-51<span class="chk"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5"/></svg></span></div><div class="t">Write the launch post</div><div class="meta"><span class="tag"><i style="background:#e2a336"></i>Marketing</span><span class="due">Fri</span><span class="av" style="background:#2f9e6b">SL</span></div></article>
-        <article class="card"><div class="top">ACM-53<span class="chk"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5"/></svg></span></div><div class="t">Update pricing page copy</div><div class="meta"><span class="tag"><i style="background:#e46aa0"></i>Design</span><span class="due">Fri</span><span class="av" style="background:#5b5bd6">JK</span></div></article>
+        <article class="card">
+          <div class="cover video"><span class="len">0:48</span><span class="play"><svg viewBox="0 0 10 12" fill="currentColor"><path d="M0 0v12l10-6z"/></svg></span><span class="wave"><i style="height:30%"></i><i style="height:60%"></i><i style="height:45%"></i><i style="height:80%"></i><i style="height:55%"></i><i style="height:95%"></i><i style="height:40%"></i><i style="height:70%"></i><i style="height:35%"></i><i style="height:85%"></i><i style="height:50%"></i><i style="height:65%"></i><i style="height:30%"></i><i style="height:75%"></i><i style="height:45%"></i><i style="height:60%"></i><i style="height:25%"></i><i style="height:55%"></i></span></div>
+          <div class="top">ACM-48 <span class="pri high"><i></i><i></i><i></i></span><span class="chk">CHECK</span></div>
+          <div class="t">Record the product demo</div>
+          <div class="meta"><span class="tag mk"><i></i>Marketing</span><span class="due soon">DUE Thu</span><span class="stat">COMMENT 4</span><span class="stack people"><span class="av s" data-p="maya"></span><span class="av s" data-p="leo"></span></span></div>
+        </article>
+        <article class="card">
+          <div class="top">ACM-51 <span class="pri high"><i></i><i></i><i></i></span><span class="chk">CHECK</span></div>
+          <div class="t">Write the launch post</div>
+          <div class="sub"><span class="track"><i style="width:40%"></i></span>2/5</div>
+          <div class="meta"><span class="tag mk"><i></i>Marketing</span><span class="due">DUE Fri</span><span class="stat">CLIP 2</span><span class="stack people"><span class="av s" data-p="sara"></span></span></div>
+        </article>
+        <article class="card">
+          <div class="top">ACM-53 <span class="chk">CHECK</span></div>
+          <div class="t">Update pricing page copy</div>
+          <div class="meta"><span class="tag ds"><i></i>Design</span><span class="due">DUE Fri</span><span class="stat">COMMENT 1</span><span class="stack people"><span class="av s" data-p="jon"></span></span></div>
+        </article>
+        <article class="card">
+          <div class="top">ACM-55 <span class="chk">CHECK</span></div>
+          <div class="t">Prepare the press kit</div>
+          <div class="meta"><span class="tag mk"><i></i>Marketing</span><span class="due">DUE Fri</span><span class="stack people"><span class="av s" data-p="priya"></span><span class="av s" data-p="maya"></span></span></div>
+        </article>
       </div>
     </section>
+
     <section class="col" data-col="doing">
-      <div class="col-h"><span class="ic"></span>In progress <span class="count">2</span><span class="plus">+</span></div>
+      <div class="col-h"><span class="ic"></span>In progress <span class="count">3</span><span class="plus">+</span></div>
       <div class="cards">
-        <article class="card" id="dragMe"><div class="top">ACM-42<span class="chk"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5"/></svg></span></div><div class="t">Polish onboarding flow</div><div class="meta"><span class="tag"><i style="background:#e46aa0"></i>Design</span><span class="due">Wed</span><span class="av" style="background:#e46aa0">MR</span></div></article>
-        <article class="card"><div class="top">ACM-45<span class="chk"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5"/></svg></span></div><div class="t">Fix sync on slow networks</div><div class="meta"><span class="tag"><i style="background:#5b5bd6"></i>Engineering</span><span class="due">Thu</span><span class="av" style="background:#5b5bd6">JK</span></div></article>
+        <article class="card" id="dragMe">
+          <div class="cover screens"><span class="ph"><i class="a"></i><i></i><i class="b"></i><i class="c"></i></span><span class="ph"><i class="a"></i><i></i><i class="b"></i><i></i><i class="c"></i></span><span class="ph"><i class="a"></i><i class="b"></i><i class="c"></i></span></div>
+          <div class="top">ACM-42 <span class="pri high"><i></i><i></i><i></i></span><span class="chk">CHECK</span></div>
+          <div class="t">Polish onboarding flow</div>
+          <div class="sub"><span class="track"><i style="width:75%"></i></span>3/4</div>
+          <div class="meta"><span class="tag ds"><i></i>Design</span><span class="due">DUE Wed</span><span class="stat">COMMENT 6</span><span class="stack people"><span class="av s" data-p="maya"></span><span class="av s" data-p="alex"></span></span></div>
+        </article>
+        <article class="card">
+          <div class="top">ACM-45 <span class="pri urgent">!</span><span class="chk">CHECK</span></div>
+          <div class="t">Fix sync on slow networks</div>
+          <div class="meta"><span class="tag en"><i></i>Engineering</span><span class="pr">PR #482</span><span class="stat">COMMENT 9</span><span class="stack people"><span class="av s" data-p="jon"></span></span></div>
+        </article>
+        <article class="card">
+          <div class="top">ACM-49 <span class="chk">CHECK</span></div>
+          <div class="t">Welcome email sequence</div>
+          <div class="sub"><span class="track"><i style="width:33%"></i></span>1/3</div>
+          <div class="meta"><span class="tag mk"><i></i>Marketing</span><span class="due">DUE Thu</span><span class="stack people"><span class="av s" data-p="priya"></span></span></div>
+        </article>
       </div>
     </section>
+
     <section class="col" data-col="done">
-      <div class="col-h"><span class="ic"></span>Done <span class="count">2</span><span class="plus">+</span></div>
+      <div class="col-h"><span class="ic"></span>Done <span class="count">3</span><span class="plus">+</span></div>
       <div class="cards">
-        <article class="card is-done"><div class="top">ACM-37<span class="chk"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5"/></svg></span></div><div class="t">New app icon</div><div class="meta"><span class="tag"><i style="background:#e46aa0"></i>Design</span><span class="due">Mon</span><span class="av" style="background:#e46aa0">MR</span></div></article>
-        <article class="card is-done"><div class="top">ACM-39<span class="chk"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5"/></svg></span></div><div class="t">Release notes for v2.0</div><div class="meta"><span class="tag"><i style="background:#2f9e6b"></i>Docs</span><span class="due">Tue</span><span class="av" style="background:#2f9e6b">SL</span></div></article>
+        <article class="card is-done">
+          <div class="cover art"><span class="app"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5 14.5 13H1.5L8 1.5Zm0 4.2L5 11h6L8 5.7Z"/></svg></span></div>
+          <div class="top">ACM-37 <span class="chk">CHECK</span></div>
+          <div class="t">New app icon</div>
+          <div class="meta"><span class="tag ds"><i></i>Design</span><span class="stat">COMMENT 12</span><span class="stack people"><span class="av s" data-p="alex"></span></span></div>
+        </article>
+        <article class="card is-done">
+          <div class="top">ACM-39 <span class="chk">CHECK</span></div>
+          <div class="t">Release notes for v2.0</div>
+          <div class="meta"><span class="tag dc"><i></i>Docs</span><span class="stat">CLIP 1</span><span class="stack people"><span class="av s" data-p="sara"></span></span></div>
+        </article>
+        <article class="card is-done">
+          <div class="top">ACM-33 <span class="chk">CHECK</span></div>
+          <div class="t">Migrate to new billing</div>
+          <div class="meta"><span class="tag en"><i></i>Engineering</span><span class="pr">PR #471</span><span class="stack people"><span class="av s" data-p="leo"></span></span></div>
+        </article>
       </div>
     </section>
   </div>
+  <div class="listview view-out" id="listview" hidden></div>
 </main>
 
 <div class="toast" id="toast">
@@ -246,9 +437,38 @@ svg { display: block; }
 
 <script>
 (function () {
-  var CHECK = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5"/></svg>';
-  var nextId = 54;
+  var ICON = {
+    CHECK: '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5"/></svg>',
+    DUE: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="2.5" y="3" width="11" height="10.5" rx="2"/><path d="M2.5 6.5h11M5.5 1.5v3M10.5 1.5v3"/></svg>',
+    COMMENT: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M2.5 3.5h11v7.5H7l-3 2.5V11H2.5V3.5Z"/></svg>',
+    CLIP: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="m12.5 7.5-4.8 4.8a2.6 2.6 0 0 1-3.7-3.7l5.3-5.3a1.7 1.7 0 0 1 2.4 2.4L6.6 10.8a.8.8 0 0 1-1.2-1.2L10 5"/></svg>',
+    PR: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="4.5" cy="3.5" r="1.6"/><circle cx="4.5" cy="12.5" r="1.6"/><circle cx="11.5" cy="12.5" r="1.6"/><path d="M4.5 5.1v5.8M11.5 10.9V7a2 2 0 0 0-2-2H7.5"/></svg>'
+  };
+  // Fill in the icon tokens used in the markup above.
+  document.querySelectorAll(".chk").forEach(function (el) { el.innerHTML = ICON.CHECK; });
+  document.querySelectorAll(".due, .stat, .pr").forEach(function (el) {
+    var m = el.textContent.match(/^(DUE|COMMENT|CLIP|PR) ?(.*)$/);
+    if (m) el.innerHTML = ICON[m[1]] + (m[2] ? " " + m[2] : "");
+  });
 
+  // Illustrated portraits (DiceBear "notionists"), with initials as a fallback when offline.
+  var PEOPLE = {
+    maya: ["Maya", "MR", "#e46aa0", "ffd5dc"], jon: ["Jon", "JK", "#5b5bd6", "c0aede"],
+    sara: ["Sara", "SL", "#2f9e6b", "d1f4d9"], alex: ["Alex", "AD", "#e2a336", "ffdfbf"],
+    priya: ["Priya", "PN", "#12a594", "b6e3f4"], leo: ["Leo", "LP", "#6e56cf", "e0d4ff"]
+  };
+  function paintAvatar(el) {
+    var p = PEOPLE[el.dataset.p]; if (!p) return;
+    el.style.background = p[2];
+    el.textContent = p[1];
+    var img = new Image();
+    img.alt = "";
+    img.onload = function () { el.style.background = "#" + p[3]; el.appendChild(img); };
+    img.src = "https://api.dicebear.com/9.x/notionists/svg?seed=" + p[0] + "&backgroundColor=" + p[3];
+  }
+  document.querySelectorAll(".av[data-p]").forEach(paintAvatar);
+
+  var nextId = 56;
   function updateCounts() {
     document.querySelectorAll(".col").forEach(function (col) {
       col.querySelector(".count").textContent = col.querySelectorAll(".cards > .card:not(.placeholder)").length;
@@ -257,7 +477,7 @@ svg { display: block; }
 
   // New task: inline composer at the top of Todo; Enter creates the card.
   var todo = document.querySelector('[data-col="todo"] .cards');
-  document.getElementById("newBtn").addEventListener("click", function () {
+  function openComposer() {
     if (todo.querySelector(".composer")) { todo.querySelector("input").focus(); return; }
     var c = document.createElement("div");
     c.className = "composer";
@@ -266,17 +486,24 @@ svg { display: block; }
     var input = c.querySelector("input");
     input.focus();
     input.addEventListener("keydown", function (e) {
+      e.stopPropagation();
       if (e.key === "Escape") { c.remove(); return; }
       if (e.key !== "Enter" || !input.value.trim()) return;
       var card = document.createElement("article");
       card.className = "card enter";
-      card.innerHTML = '<div class="top">ACM-' + (nextId++) + '<span class="chk">' + CHECK + '</span></div><div class="t"></div>' +
-        '<div class="meta"><span class="tag"><i style="background:#5b5bd6"></i>Engineering</span><span class="due">Fri</span><span class="av" style="background:#5b5bd6">JK</span></div>';
+      card.innerHTML = '<div class="top">ACM-' + (nextId++) + ' <span class="pri high"><i></i><i></i><i></i></span><span class="chk">' + ICON.CHECK + '</span></div><div class="t"></div>' +
+        '<div class="meta"><span class="tag en"><i></i>Engineering</span><span class="due">' + ICON.DUE + ' Fri</span><span class="stack people"><span class="av s" data-p="maya"></span></span></div>';
       card.querySelector(".t").textContent = input.value.trim();
       c.replaceWith(card);
+      card.querySelectorAll(".av[data-p]").forEach(paintAvatar);
       bindDrag(card);
       updateCounts();
     });
+  }
+  document.getElementById("newBtn").addEventListener("click", openComposer);
+  addEventListener("keydown", function (e) {
+    if (e.key === "F5") { location.reload(); return; }
+    if ((e.key === "c" || e.key === "C") && !e.ctrlKey && !e.metaKey && document.activeElement.tagName !== "INPUT") { e.preventDefault(); document.getElementById("newBtn").click(); }
   });
 
   // Drag and drop between columns, with a lifted ghost and a placeholder.
@@ -324,8 +551,7 @@ svg { display: block; }
         setTimeout(function () {
           ghost.remove();
           card.classList.remove("placeholder");
-          var done = card.closest(".col").dataset.col === "done";
-          card.classList.toggle("is-done", done);
+          card.classList.toggle("is-done", card.closest(".col").dataset.col === "done");
           updateCounts();
         }, 280);
       }
@@ -354,8 +580,89 @@ svg { display: block; }
     }, 700);
   });
 
-  // F5 resets the board for another take.
-  addEventListener("keydown", function (e) { if (e.key === "F5") location.reload(); });
+  // List view: rebuilt from the board's cards each time, so new and moved tasks always match.
+  var board = document.querySelector(".board"), listview = document.getElementById("listview");
+  var NAMES = { todo: "Todo", doing: "In progress", done: "Done" };
+  var view = "board";
+  function cell(card, sel) { var el = card.querySelector(sel); return el ? el.cloneNode(true) : document.createElement("span"); }
+  function renderList(fresh) {
+    listview.innerHTML = "";
+    document.querySelectorAll(".col").forEach(function (col) {
+      var cards = [].slice.call(col.querySelectorAll(".cards > .card:not(.placeholder)"));
+      var g = document.createElement("section");
+      g.className = "lgroup";
+      g.innerHTML = '<div class="lgroup-h" data-col="' + col.dataset.col + '"><span class="ic"></span>' + NAMES[col.dataset.col] + ' <span class="count">' + cards.length + "</span></div>";
+      cards.forEach(function (card) {
+        var row = document.createElement("div");
+        row.className = "lrow" + (card.classList.contains("is-done") ? " done" : "") + (card === fresh ? " lrow-in" : "");
+        var id = document.createElement("span");
+        id.className = "id";
+        id.textContent = card.querySelector(".top").firstChild.textContent.trim();
+        var pri = card.querySelector(".top .pri");
+        if (pri) id.appendChild(pri.cloneNode(true));
+        var title = document.createElement("span");
+        title.className = "title";
+        title.textContent = card.querySelector(".t").textContent;
+        var stats = document.createElement("span");
+        stats.className = "stats";
+        card.querySelectorAll(".meta .stat, .meta .pr").forEach(function (s) { stats.appendChild(s.cloneNode(true)); });
+        var box = document.createElement("span");
+        box.className = "box";
+        box.innerHTML = ICON.CHECK;
+        box.addEventListener("click", function () { toggleDone(card); });
+        [box, id, title, cell(card, ".meta .tag"), cell(card, ".meta .due"), stats, cell(card, ".meta .people")].forEach(function (c) { row.appendChild(c); });
+        g.appendChild(row);
+      });
+      listview.appendChild(g);
+    });
+  }
+  // Checking a task moves it to Done (unchecking sends it back to Todo), in both views.
+  function toggleDone(card) {
+    var toDone = !card.classList.contains("is-done");
+    var target = document.querySelector('[data-col="' + (toDone ? "done" : "todo") + '"] .cards');
+    target.prepend(card);
+    card.classList.toggle("is-done", toDone);
+    updateCounts();
+    renderList(card);
+  }
+  function setView(next) {
+    if (next === view) return;
+    var from = view === "list" ? listview : board, to = next === "list" ? listview : board;
+    view = next;
+    if (next === "list") renderList();
+    from.classList.add("view-out");
+    setTimeout(function () {
+      from.hidden = true; from.style.display = "none";
+      to.hidden = false; to.style.display = "";
+      void to.offsetWidth;
+      to.classList.remove("view-out");
+    }, 180);
+  }
+  board.style.display = "";
+
+  // View switcher: Board and List switch views; filter chips toggle, for zoom demos.
+  document.querySelectorAll(".seg span").forEach(function (s) {
+    s.style.cursor = "pointer";
+    s.addEventListener("click", function () {
+      document.querySelectorAll(".seg span").forEach(function (o) { o.classList.toggle("on", o === s); });
+      var name = s.textContent.trim();
+      if (name === "List") setView("list");
+      else if (name === "Board") setView("board");
+    });
+  });
+  // New task always opens on the board.
+  document.getElementById("newBtn").addEventListener("click", function () {
+    if (view !== "list") return;
+    document.querySelectorAll(".seg span").forEach(function (o) { o.classList.toggle("on", o.textContent.trim() === "Board"); });
+    view = "board";
+    listview.classList.add("view-out"); listview.hidden = true;
+    board.hidden = false; board.style.display = ""; board.classList.remove("view-out");
+    openComposer();
+  });
+  document.querySelectorAll(".chipf").forEach(function (c) {
+    c.style.cursor = "pointer";
+    c.addEventListener("click", function () { c.classList.toggle("on"); });
+  });
 })();
 </script>
 </body>

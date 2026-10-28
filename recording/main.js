@@ -6,8 +6,8 @@ const path = require("path");
 
 app.whenReady().then(() => {
   const win = new BrowserWindow({
-    width: 1600,
-    height: 900,
+    width: Number(process.env.ACME_W) || 1600,
+    height: Number(process.env.ACME_H) || 900,
     useContentSize: true,
     title: "Acme",
     backgroundColor: "#fbfbfa",
