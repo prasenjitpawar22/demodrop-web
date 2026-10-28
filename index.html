@@ -160,7 +160,6 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .enter.d4 { animation-delay: 240ms; } .enter.d5 { animation-delay: 300ms; } .enter.d6 { animation-delay: 420ms; }
 @keyframes rise { from { opacity: 0; transform: translateY(14px); filter: blur(6px); } to { opacity: 1; transform: none; filter: blur(0); } }
 
-/* ---------- Showcase: tabs + editor ---------- */
 /* ---------- Hero stage: the video grows to fill the screen as you scroll ---------- */
 /* Full-bleed, pinned while it grows. JS writes transform/opacity directly (no CSS vars per frame). */
 .stage-scroll { position: relative; z-index: 2; height: 175vh; width: 100vw; margin-left: calc(50% - 50vw); margin-top: 56px; }
@@ -210,8 +209,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .nav.on-dark .btn-dark { background: #f3f0f8; color: var(--ink); }
 @media (hover: hover) and (pointer: fine) { .nav.on-dark .nav-links a:not(.btn):hover { color: #fff; } }
 
-/* Editor explainer (in Features) */
-.showcase { position: relative; margin-top: 56px; text-align: center; }
+/* Tabs with a clip-path pill (used by the feature chapters) */
 .tabs {
   position: relative; display: inline-flex; gap: 2px; padding: 4px; border-radius: 999px;
   background: rgba(255,255,255,0.75); box-shadow: 0 0 0 1px var(--line), 0 1px 2px rgba(17,16,22,0.04);
@@ -242,183 +240,6 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .tabs.auto .tabs-hl .tab.on .prog::after { animation: prog var(--dur, 7s) linear forwards; }
 @keyframes prog { to { transform: scaleX(1); } }
 
-.editor-wrap { position: relative; margin-top: 22px; }
-.editor-glow { position: absolute; inset: 14% 10% -2%; border-radius: 48px; background: #111016; filter: blur(70px); opacity: 0.16; }
-.editor {
-  position: relative; text-align: left; border-radius: 18px; overflow: hidden;
-  background: #121119; color: #ece9f3;
-  box-shadow: 0 0 0 1px rgba(17,16,22,0.9), 0 0 0 7px rgba(255,255,255,0.55), 0 0 0 8px var(--line), 0 50px 100px -40px rgba(30, 10, 50, 0.55);
-  display: grid; grid-template-columns: 1fr 252px; grid-template-rows: 40px 1fr auto;
-}
-.ed-bar { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; padding: 0 10px 0 14px; border-bottom: 1px solid rgba(255,255,255,0.07); background: #17151f; }
-.ed-bar .dots { display: flex; gap: 7px; }
-.ed-bar .dots i { width: 11px; height: 11px; border-radius: 50%; background: #3a3547; }
-.ed-bar .dots i:nth-child(1) { background: #ff5f57; } .ed-bar .dots i:nth-child(2) { background: #febc2e; } .ed-bar .dots i:nth-child(3) { background: #28c840; }
-.ed-bar .file { flex: 1; text-align: center; font-size: 12.5px; color: #8e89a0; }
-.ed-bar .file b { color: #ece9f3; font-weight: 500; }
-.ed-bar .export { height: 26px; padding: 0 12px; border-radius: 7px; background: #ececf1; color: #111016; font-size: 12px; font-weight: 600; display: grid; place-items: center; }
-
-.ed-canvas {
-  position: relative; padding: 26px; display: grid; place-items: center;
-  background-color: #0d0c12;
-  background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px);
-  background-size: 14px 14px;
-}
-.canvas {
-  position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; container-type: inline-size;
-  clip-path: inset(0% 0% 0% 0% round 10px);
-  transition: clip-path 700ms var(--ease-in-out);
-}
-.bgs, .bgs i { position: absolute; inset: 0; }
-.bgs i { opacity: 0; transition: opacity 700ms ease; }
-.bgs i:nth-child(1) { opacity: 1; background: radial-gradient(120% 90% at 0% 0%, #5c5a68, transparent 55%), radial-gradient(110% 90% at 100% 100%, #2b2a33, transparent 55%), linear-gradient(135deg, #3a3842, #0f0e13); }
-.bgs i:nth-child(2) { background: radial-gradient(120% 100% at 0% 0%, #ffd7a8, transparent 60%), linear-gradient(135deg, #ffb48a, #e0598f); }
-.bgs i:nth-child(3) { background: radial-gradient(120% 100% at 100% 0%, #a3e7ff, transparent 55%), linear-gradient(135deg, #5ec8f2, #6a4ff0); }
-.bgs i:nth-child(4) { background: radial-gradient(120% 100% at 0% 100%, #4b3a8a, transparent 60%), linear-gradient(135deg, #1d1b2e, #3b2f6e); }
-.editor[data-mode="bg"][data-bg="1"] .bgs i:nth-child(2),
-.editor[data-mode="bg"][data-bg="2"] .bgs i:nth-child(3),
-.editor[data-mode="bg"][data-bg="3"] .bgs i:nth-child(4) { opacity: 1; }
-
-/* The recorded window, centered on the canvas */
-.rec {
-  position: absolute; left: 12%; top: 8%; width: 76%; aspect-ratio: 16 / 10;
-  border-radius: 1.2cqw; overflow: hidden; background: #121019;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 2.4cqw 5cqw -1cqw rgba(30, 6, 40, 0.65);
-  container-type: inline-size; display: flex; flex-direction: column;
-  transform-origin: 50% 50%;
-  transition: transform 700ms var(--ease-in-out), border-radius 700ms var(--ease-in-out);
-}
-.editor[data-mode="bg"] .rec { transform: scale(0.84); border-radius: 2.4cqw; }
-.editor[data-mode="format"][data-ratio="1"] .canvas { clip-path: inset(0% 21.875% 0% 21.875% round 10px); }
-.editor[data-mode="format"][data-ratio="2"] .canvas { clip-path: inset(0% 34.18% 0% 34.18% round 10px); }
-.editor[data-mode="format"][data-ratio="1"] .rec { transform: scale(0.62); }
-.editor[data-mode="format"][data-ratio="2"] .rec { transform: scale(0.37); }
-
-.rec .tb { flex: none; height: 4.6%; display: flex; align-items: center; gap: 0.8cqw; padding-left: 1.6cqw; background: #1a1724; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.rec .tb i { width: 1cqw; height: 1cqw; border-radius: 50%; background: #3a3547; }
-.rec .vp { position: relative; flex: 1; overflow: hidden; }
-
-.screen { position: absolute; inset: 0; transform-origin: 62% 71%; transition: opacity 400ms ease; }
-.editor[data-mode="zoom"] .screen { animation: zoom 7s infinite; }
-.editor[data-mode="cursor"] .screen { opacity: 0.45; }
-.screen > * { position: absolute; }
-.m-side { left: 0; top: 0; width: 20%; height: 100%; background: #16131f; border-right: 1px solid rgba(255,255,255,0.05); padding: 2.6cqw 1.8cqw; }
-.m-side .logo { width: 2.8cqw; height: 2.8cqw; border-radius: 0.8cqw; background: #ececf1; margin-bottom: 2.6cqw; }
-.m-side .item { height: 1cqw; border-radius: 1cqw; background: rgba(255,255,255,0.09); margin-bottom: 1.7cqw; width: 75%; }
-.m-side .item.on { background: rgba(255,255,255,0.45); width: 85%; }
-.m-side .item:nth-child(4) { width: 60%; } .m-side .item:nth-child(5) { width: 80%; }
-.m-top { left: 20%; top: 0; right: 0; height: 12%; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; padding: 0 2.6cqw; }
-.m-top .search { width: 34%; height: 2.8cqw; border-radius: 2cqw; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.06); }
-.m-top .avatar { margin-left: auto; width: 2.8cqw; height: 2.8cqw; border-radius: 50%; background: linear-gradient(135deg, #e4e2e9, #8e8a99); }
-.m-title { left: 24%; top: 17%; font-size: 2.5cqw; font-weight: 600; letter-spacing: -0.02em; color: #f5f2fa; line-height: 1; }
-.m-sub { left: 24%; top: 25.5%; font-size: 1.25cqw; color: #8d87a0; line-height: 1; }
-.m-card { background: #1a1724; border: 1px solid rgba(255,255,255,0.06); border-radius: 1.3cqw; }
-.m-chart { left: 24%; top: 33%; width: 40%; height: 59%; padding: 2.2cqw; display: flex; align-items: flex-end; gap: 1.1cqw; }
-.m-chart b { flex: 1; border-radius: 0.5cqw 0.5cqw 0.2cqw 0.2cqw; background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.22)); }
-.m-release { left: 67%; top: 33%; width: 29%; height: 59%; padding: 2.2cqw; }
-.m-release .m-tag { display: inline-block; font-size: 1.05cqw; font-weight: 600; color: #e9e7ee; background: rgba(255,255,255,0.1); padding: 0.45cqw 1cqw; border-radius: 1cqw; line-height: 1.2; }
-.m-release .ver { font-size: 2.4cqw; font-weight: 600; margin-top: 1.3cqw; letter-spacing: -0.02em; line-height: 1.1; color: #f5f2fa; }
-.m-release .ln { height: 0.9cqw; border-radius: 1cqw; background: rgba(255,255,255,0.08); margin-top: 1.2cqw; }
-.m-release .ln.s { width: 70%; }
-.m-btn {
-  left: 69.5%; top: 74%; width: 24%; height: 11%; border-radius: 1cqw; background: #f3f2f6;
-  display: grid; place-items: center; overflow: hidden; font-size: 1.45cqw; font-weight: 600; color: #111016;
-  box-shadow: 0 0.6cqw 1.6cqw -0.4cqw rgba(0,0,0,0.6);
-}
-.m-btn span { grid-area: 1 / 1; display: flex; align-items: center; gap: 0.5cqw; }
-.m-btn .done { opacity: 0; }
-.m-btn .done svg { width: 1.6cqw; height: 1.6cqw; }
-.editor[data-mode="zoom"] .m-btn .done { animation: done 7s infinite; }
-.editor[data-mode="zoom"] .m-btn .idle { animation: idle 7s infinite; }
-.ripple { left: 81.5%; top: 79.5%; width: 7cqw; height: 7cqw; margin: -3.5cqw 0 0 -3.5cqw; border-radius: 50%; border: 0.35cqw solid rgba(255,255,255,0.9); opacity: 0; }
-.editor[data-mode="zoom"] .ripple { animation: ripple 7s infinite; }
-.cursor-track { inset: 0; pointer-events: none; transition: opacity 250ms ease; }
-.cursor-track svg { width: 2.4cqw; height: auto; transform-origin: 10% 5%; filter: drop-shadow(0 0.25cqw 0.4cqw rgba(0,0,0,0.45)); }
-.editor[data-mode="zoom"] .cursor-track { animation: track 7s infinite; }
-.editor[data-mode="zoom"] .cursor-track svg { animation: press 7s infinite; }
-.editor:not([data-mode="zoom"]) .cursor-track { opacity: 0; }
-
-@keyframes track {
-  0%, 8%   { transform: translate(34%, 88%); animation-timing-function: cubic-bezier(.45,0,.2,1); }
-  25%, 62% { transform: translate(81.5%, 79.5%); animation-timing-function: cubic-bezier(.45,0,.2,1); }
-  84%      { transform: translate(46%, 42%); animation-timing-function: cubic-bezier(.45,0,.2,1); }
-  100%     { transform: translate(34%, 88%); }
-}
-@keyframes press { 0%, 26%, 30%, 100% { transform: scale(1); } 27.5% { transform: scale(0.8); } }
-@keyframes ripple {
-  0%, 26.5% { opacity: 0; transform: scale(0.25); }
-  27.5% { opacity: 0.95; transform: scale(0.3); animation-timing-function: cubic-bezier(.2,.7,.1,1); }
-  40%, 100% { opacity: 0; transform: scale(1.5); }
-}
-@keyframes zoom {
-  0%, 28% { transform: scale(1); animation-timing-function: cubic-bezier(.65,0,.25,1); }
-  42%, 64% { transform: scale(1.85); animation-timing-function: cubic-bezier(.65,0,.25,1); }
-  80%, 100% { transform: scale(1); }
-}
-@keyframes done { 0%, 28% { opacity: 0; transform: translateY(40%); } 32%, 90% { opacity: 1; transform: none; } 95%, 100% { opacity: 0; } }
-@keyframes idle { 0%, 28% { opacity: 1; transform: none; } 32%, 90% { opacity: 0; transform: translateY(-40%); } 95%, 100% { opacity: 1; transform: none; } }
-
-/* Cursor mode: raw path vs smoothed path */
-.cur-ov { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 400ms ease; pointer-events: none; }
-.editor[data-mode="cursor"] .cur-ov { opacity: 1; }
-.cur-ov .smooth { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 3.2s infinite; }
-.cur-ov .end { transform-box: fill-box; transform-origin: center; animation: endRipple 3.2s infinite; }
-@keyframes draw { 0% { stroke-dashoffset: 1; animation-timing-function: cubic-bezier(.45,0,.2,1); } 75%, 100% { stroke-dashoffset: 0; } }
-@keyframes endRipple { 0%, 74% { opacity: 0; transform: scale(0.3); } 76% { opacity: 1; transform: scale(0.4); } 95%, 100% { opacity: 0; transform: scale(1.6); } }
-.cur-ov .lbl { font: 600 3.2px "Geist", sans-serif; letter-spacing: 0.02em; }
-
-/* Inspector */
-.ed-insp { border-left: 1px solid rgba(255,255,255,0.07); background: #15131c; padding: 16px; display: grid; }
-.panel { grid-area: 1 / 1; opacity: 0; visibility: hidden; transform: translateY(4px); filter: blur(4px);
-  transition: opacity 250ms ease, transform 250ms var(--ease-out), filter 250ms ease, visibility 0s 250ms; }
-.editor[data-mode="zoom"] .panel[data-for="zoom"],
-.editor[data-mode="cursor"] .panel[data-for="cursor"],
-.editor[data-mode="bg"] .panel[data-for="bg"],
-.editor[data-mode="format"] .panel[data-for="format"] { opacity: 1; visibility: visible; transform: none; filter: none; transition-delay: 0s; }
-.p-h { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #8e89a0; margin-bottom: 12px; }
-.p-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12.5px; color: #c9c4d6; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.p-row:last-child { border-bottom: 0; }
-.p-row .v { color: #8e89a0; font-variant-numeric: tabular-nums; }
-.toggle { width: 28px; height: 16px; border-radius: 99px; background: #ececf1; position: relative; flex: none; }
-.toggle::after { content: ""; position: absolute; right: 2px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: #15131c; }
-.slider { position: relative; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.1); margin: 4px 0 6px; }
-.slider b { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: rgba(255,255,255,0.85); }
-.slider b::after { content: ""; position: absolute; right: -6px; top: -4px; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.4); }
-.p-block { padding: 10px 0 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12.5px; color: #c9c4d6; }
-.p-block .top { display: flex; justify-content: space-between; margin-bottom: 8px; }
-.p-block .top .v { color: #8e89a0; }
-.sw { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 4px; }
-.sw i { aspect-ratio: 1; border-radius: 8px; box-shadow: 0 0 0 1px rgba(255,255,255,0.12); transition: box-shadow 250ms ease; }
-.sw i:nth-child(1) { background: linear-gradient(135deg, #5c5a68, #16151b); }
-.sw i:nth-child(2) { background: linear-gradient(135deg, #ffb48a, #e0598f); }
-.sw i:nth-child(3) { background: linear-gradient(135deg, #5ec8f2, #6a4ff0); }
-.sw i:nth-child(4) { background: linear-gradient(135deg, #1d1b2e, #3b2f6e); }
-.editor[data-bg="0"] .sw i:nth-child(1), .editor[data-bg="1"] .sw i:nth-child(2),
-.editor[data-bg="2"] .sw i:nth-child(3), .editor[data-bg="3"] .sw i:nth-child(4) { box-shadow: 0 0 0 2px #121119, 0 0 0 3.5px #fff; }
-.ratios { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.ratios span { height: 58px; border-radius: 9px; display: grid; place-items: center; align-content: center; gap: 5px; font-size: 11.5px; color: #8e89a0; background: rgba(255,255,255,0.04); box-shadow: 0 0 0 1px rgba(255,255,255,0.08); transition: background-color 250ms ease, color 250ms ease, box-shadow 250ms ease; }
-.ratios span i { display: block; border: 1.5px solid currentColor; border-radius: 3px; }
-.ratios span:nth-child(1) i { width: 22px; height: 13px; } .ratios span:nth-child(2) i { width: 16px; height: 16px; } .ratios span:nth-child(3) i { width: 11px; height: 19px; }
-.editor[data-ratio="0"] .ratios span:nth-child(1), .editor[data-ratio="1"] .ratios span:nth-child(2), .editor[data-ratio="2"] .ratios span:nth-child(3) { color: #fff; background: rgba(255,255,255,0.12); box-shadow: 0 0 0 1px rgba(255,255,255,0.6); }
-.seg { display: grid; grid-template-columns: 1fr 1fr; padding: 3px; border-radius: 8px; background: rgba(255,255,255,0.05); font-size: 12px; text-align: center; }
-.seg span { padding: 5px 0; border-radius: 6px; color: #8e89a0; }
-.seg span.on { background: rgba(255,255,255,0.1); color: #fff; }
-
-/* Timeline */
-.ed-tl { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,0.07); background: #15131c; padding: 12px 14px 14px; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; align-items: center; font-size: 11px; color: #8e89a0; }
-.ed-tl .lab { width: 44px; }
-.ed-tl .row { position: relative; height: 24px; border-radius: 6px; background: rgba(255,255,255,0.03); }
-.ed-tl .clip { position: absolute; inset: 0; border-radius: 6px; background: linear-gradient(90deg, rgba(120,110,150,0.35), rgba(120,110,150,0.25)); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
-  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 40px, rgba(0,0,0,0.75) 40px 41px); mask-image: repeating-linear-gradient(90deg, #000 0 40px, rgba(0,0,0,0.75) 40px 41px); }
-.ed-tl .blk { position: absolute; top: 0; bottom: 0; border-radius: 6px; display: flex; align-items: center; padding-left: 8px; color: #fff; font-weight: 500; white-space: nowrap; overflow: hidden; }
-.ed-tl .z { left: 28%; width: 52%; background: rgba(255,255,255,0.2); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.35); }
-.ed-tl .sp { left: 84%; width: 12%; background: repeating-linear-gradient(-45deg, rgba(255,180,120,0.55) 0 5px, rgba(255,180,120,0.3) 5px 10px); box-shadow: inset 0 0 0 1px rgba(255,200,150,0.4); }
-.ed-tl .click { position: absolute; top: 50%; left: 27.5%; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.18); }
-.ed-tl .tracks { position: relative; display: grid; gap: 6px; grid-column: 2; grid-row: 1 / span 2; }
-.ed-tl .head-rail { position: absolute; top: -4px; bottom: -4px; left: 0; right: 0; animation: playhead 7s linear infinite; pointer-events: none; }
-.ed-tl .head-rail::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; margin-left: -1px; border-radius: 2px; background: #fff; box-shadow: 0 0 8px rgba(255,255,255,0.7); }
-@keyframes playhead { from { transform: translateX(0); } to { transform: translateX(100%); } }
-
 /* ---------- Sections ---------- */
 section { position: relative; }
 .sec { padding: 112px 0; }
@@ -429,72 +250,48 @@ section { position: relative; }
 .sec-head h2 .serif, .h2 .serif { letter-spacing: inherit; }
 .sec-head p { margin: 0; color: var(--muted); font-size: 17px; max-width: 460px; }
 
-/* Feature cells: hairline grid */
-.cells { margin-top: 56px; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: var(--panel); box-shadow: 0 1px 2px rgba(17,16,22,0.03); }
-.cell { position: relative; padding: 28px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: flex; flex-direction: column; min-height: 320px; }
-.cell .art { height: 150px; margin-bottom: 26px; border-radius: 12px; background: var(--bg); box-shadow: inset 0 0 0 1px var(--line); position: relative; overflow: hidden; display: grid; place-items: center; }
-.cell h3 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -0.015em; }
-.cell p { margin: 6px 0 0; color: var(--muted); font-size: 14.5px; line-height: 1.55; }
-
-/* Art: speed-up */
-.a-speed { width: 82%; }
-.a-speed .bar { position: relative; height: 36px; border-radius: 9px; background: var(--panel); box-shadow: 0 0 0 1px var(--line-2); overflow: hidden; }
-.a-speed .s { position: absolute; top: 5px; bottom: 5px; border-radius: 5px; background: rgba(17,16,22,0.07); }
-.a-speed .s1 { left: 5px; width: 30%; } .a-speed .s3 { right: 5px; left: calc(70% + 4px); }
-.a-speed .s2 { left: calc(30% + 9px); width: calc(40% - 13px); background: repeating-linear-gradient(-45deg, #2a2930 0 5px, #55525e 5px 10px); display: grid; place-items: center; color: #fff; font-size: 11px; font-weight: 700; }
-.a-speed .ph { position: absolute; inset: 0; animation: speedhead 4s infinite; }
-.a-speed .ph::after { content: ""; position: absolute; left: 0; top: 2px; bottom: 2px; width: 2px; margin-left: -1px; background: var(--ink); border-radius: 2px; }
-.a-speed .t { display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: var(--faint); }
-@keyframes speedhead {
-  0% { transform: translateX(2%); animation-timing-function: linear; }
-  40% { transform: translateX(31%); animation-timing-function: linear; }
-  50% { transform: translateX(70%); animation-timing-function: linear; }
-  90%, 100% { transform: translateX(98%); }
+/* Feature chapters: heading, optional tabs, one big product clip, three notes */
+.chapter { margin-top: 128px; }
+.chapter:first-of-type { margin-top: 88px; }
+.ch-head { text-align: center; max-width: 680px; margin: 0 auto; }
+.ch-title { margin: 14px 0 0; font-size: clamp(30px, 4.2vw, 48px); line-height: 1.04; letter-spacing: -0.04em; font-weight: 600; }
+.ch-head p { margin: 16px auto 0; color: var(--muted); font-size: 17px; max-width: 560px; }
+.ch-tabs { margin-top: 28px; text-align: center; }
+.ch-media {
+  position: relative; margin-top: 28px; aspect-ratio: 16 / 9; border-radius: 20px; overflow: hidden; background: #121119;
+  box-shadow: 0 0 0 1px rgba(17,16,22,0.9), 0 0 0 7px rgba(255,255,255,0.6), 0 0 0 8px var(--line), 0 40px 80px -40px rgba(17,16,22,0.45);
 }
+.ch-tabs + .ch-media { margin-top: 20px; }
+.ch-head + .ch-media { margin-top: 36px; }
 
-/* Art: blur */
-.a-blur { width: 84%; background: var(--panel); border-radius: 10px; box-shadow: 0 0 0 1px var(--line-2); padding: 8px 14px; font-size: 12.5px; }
-.a-blur .r { display: flex; gap: 10px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--line); }
-.a-blur .r:last-child { border-bottom: 0; }
-.a-blur .k { width: 58px; color: var(--faint); flex: none; }
-.a-blur .m { position: relative; padding: 1px 6px; }
-.a-blur .m span { filter: blur(4px); user-select: none; }
-.a-blur .m::after { content: ""; position: absolute; inset: -2px -3px; border-radius: 6px; border: 1.5px dashed rgba(17,16,22,0.55); }
+/* A media slot: placeholder underneath, the clip fades in once it has a frame */
+.media { position: absolute; inset: 0; margin: 0; opacity: 0; visibility: hidden; transition: opacity 400ms ease, visibility 0s 400ms; }
+.media.on { opacity: 1; visibility: visible; transition-delay: 0s; }
+.media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 400ms ease; }
+.media.ready video { opacity: 1; }
+.media-ph {
+  position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 6px; text-align: center; color: #8e89a0;
+  background-color: #121119; background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px); background-size: 16px 16px;
+  transition: opacity 300ms ease;
+}
+.media.ready .media-ph { opacity: 0; }
+.media-ph .ph-ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; margin-bottom: 6px; background: rgba(255,255,255,0.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); color: #e9e7ee; }
+.media-ph .ph-ic svg { width: 22px; height: 22px; }
+.media-ph b { color: #e9e7ee; font-size: 15px; font-weight: 500; }
+.media-ph span { font-size: 13px; }
 
-/* Art: export */
-.a-exp { display: flex; gap: 10px; }
-.a-exp .f { width: 78px; height: 96px; border-radius: 10px; background: var(--panel); box-shadow: 0 0 0 1px var(--line-2), 0 6px 14px -8px rgba(17,16,22,0.25); position: relative; display: grid; place-items: end center; padding-bottom: 12px; font-size: 11px; color: var(--muted); }
-.a-exp .f b { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 44px; height: 30px; border-radius: 7px; display: grid; place-items: center; color: #fff; font-size: 11px; font-weight: 700; background: var(--grad); }
-.a-exp .f.gif b { background: linear-gradient(180deg, #8e8a99, #55525e); }
-.a-exp .f:nth-child(1) { transform: rotate(-5deg) translateY(4px); } .a-exp .f:nth-child(2) { transform: rotate(4deg); }
+.notes { list-style: none; margin: 28px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); }
+.notes li { padding: 22px 24px 0 0; }
+.notes li + li { padding-left: 24px; border-left: 1px solid var(--line); }
+.notes b { display: block; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.notes span { display: block; margin-top: 4px; color: var(--muted); font-size: 14.5px; line-height: 1.55; }
 
-/* Art: screen or window */
-.a-src { width: 74%; aspect-ratio: 16 / 9; border-radius: 8px; background: var(--panel); box-shadow: 0 0 0 1px var(--line-2); position: relative; }
-.a-src::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 10px; border-bottom: 1px solid var(--line); background: rgba(17,16,22,0.03); border-radius: 8px 8px 0 0; }
-.a-src .w { position: absolute; border-radius: 5px; background: rgba(17,16,22,0.05); box-shadow: 0 0 0 1px var(--line); }
-.a-src .w1 { left: 8%; top: 22%; width: 40%; height: 62%; }
-.a-src .w2 { left: 44%; top: 30%; width: 48%; height: 58%; background: var(--panel); box-shadow: 0 0 0 1.5px var(--ink), 0 8px 18px -8px rgba(17,16,22,0.35); }
-.a-src .w2::after { content: "REC"; position: absolute; right: 6px; top: 6px; font-size: 8.5px; font-weight: 700; color: #fff; background: var(--pink); padding: 1px 5px; border-radius: 4px; letter-spacing: 0.05em; }
-
-/* Art: zoom blocks */
-.a-zoom { width: 84%; display: grid; gap: 7px; }
-.a-zoom .row { position: relative; height: 26px; border-radius: 7px; background: var(--panel); box-shadow: 0 0 0 1px var(--line-2); }
-.a-zoom .b { position: absolute; top: 3px; bottom: 3px; border-radius: 5px; color: #fff; font-size: 10.5px; font-weight: 600; display: flex; align-items: center; padding-left: 7px; background: var(--grad); }
-.a-zoom .b1 { left: 6%; width: 26%; } .a-zoom .b2 { left: 44%; width: 34%; }
-.a-zoom .b2::before, .a-zoom .b2::after { content: ""; position: absolute; top: 4px; bottom: 4px; width: 3px; border-radius: 2px; background: rgba(255,255,255,0.85); }
-.a-zoom .b2::before { left: 3px; } .a-zoom .b2::after { right: 3px; }
-.a-zoom .b2 { padding-left: 10px; }
-.a-zoom .clicks { height: 12px; position: relative; }
-.a-zoom .clicks i { position: absolute; top: 3px; width: 6px; height: 6px; border-radius: 50%; background: var(--ink); }
-
-/* Art: click ripple + idle hide */
-.a-click { position: relative; width: 120px; height: 100px; }
-.a-click .ring { position: absolute; left: 30px; top: 22px; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; border: 2px solid var(--pink); opacity: 0; animation: ring 2.4s var(--ease-out) infinite; }
-.a-click .ring.r2 { animation-delay: 0.18s; border-color: var(--violet); }
-.a-click svg { position: absolute; left: 29px; top: 21px; width: 26px; filter: drop-shadow(0 4px 6px rgba(17,16,22,0.3)); animation: idlehide 2.4s infinite; }
-@keyframes ring { 0%, 10% { opacity: 0; transform: scale(0.4); } 14% { opacity: 1; transform: scale(0.45); } 55%, 100% { opacity: 0; transform: scale(1.5); } }
-@keyframes idlehide { 0%, 10% { transform: scale(1); } 12% { transform: scale(0.82); } 16%, 100% { transform: scale(1); } }
-
+/* Finishing touches: four clip cards */
+.finish { margin-top: 36px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.fcard { background: var(--panel); border-radius: 20px; padding: 8px 8px 24px; box-shadow: 0 0 0 1px var(--line), 0 1px 2px rgba(17,16,22,0.04); }
+.card-media { position: relative; aspect-ratio: 16 / 10; border-radius: 14px; overflow: hidden; background: #121119; }
+.fcard h4 { margin: 20px 16px 0; font-size: 17px; font-weight: 600; letter-spacing: -0.015em; }
+.fcard p { margin: 6px 16px 0; color: var(--muted); font-size: 14.5px; line-height: 1.55; }
 /* ---------- Steps ---------- */
 .steps { margin-top: 56px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--line); }
 .step { padding: 28px 28px 0 0; }
@@ -582,21 +379,14 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 980px) {
-  .editor { grid-template-columns: 1fr; }
-  .ed-insp { display: none; }
-  .cells { grid-template-columns: 1fr 1fr; }
+  .notes li { padding-right: 16px; }
+  .notes li + li { padding-left: 16px; }
   .sec-head, .faq-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 720px) {
   .nav-links a:not(.btn) { display: none; }
   .nav.scrolled .nav-inner { max-width: 100%; }
   .hero { padding-top: 112px; }
-  .ed-canvas { padding: 12px; }
-  .ed-bar .file { display: none; }
-  .ed-bar { justify-content: space-between; }
-  .ed-tl .lab { display: none; }
-  .ed-tl { grid-template-columns: 1fr; }
-  .ed-tl .tracks { grid-column: 1; }
   /* Phones: no pinning or growth, just the framed video */
   .stage-scroll { height: auto; width: auto; margin: 40px 0 0; padding: 0 16px 64px; }
   .stage-sticky { position: static; height: auto; overflow: visible; }
@@ -607,8 +397,13 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
   .stage-time { display: none; }
   .made-with { font-size: 12.5px; }
   .sec { padding: 80px 0; }
-  .cells { grid-template-columns: 1fr; }
-  .cell { min-height: 0; }
+  .chapter { margin-top: 96px; }
+  .chapter:first-of-type { margin-top: 64px; }
+  .ch-media { border-radius: 14px; box-shadow: 0 0 0 1px rgba(17,16,22,0.9), 0 30px 60px -30px rgba(17,16,22,0.45); }
+  .notes { grid-template-columns: 1fr; }
+  .notes li, .notes li + li { padding: 18px 0; border-left: 0; }
+  .notes li + li { border-top: 1px solid var(--line); }
+  .finish { grid-template-columns: 1fr; }
   .steps { grid-template-columns: 1fr; }
   .step, .step + .step { padding: 24px 0; border-left: 0; }
   .step + .step { border-top: 1px solid var(--line); }
@@ -630,13 +425,7 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
 @media (prefers-reduced-motion: reduce) {
   .enter { animation: fade 300ms ease both; }
   @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
-  .editor .screen, .editor .cursor-track, .editor .cursor-track svg, .editor .ripple, .editor .m-btn span,
-  .ed-tl .head-rail, .a-speed .ph, .a-click .ring, .a-click svg, .cur-ov .smooth, .cur-ov .end { animation: none !important; }
-  .cur-ov .smooth { stroke-dashoffset: 0; }
-  .editor[data-mode="zoom"] .cursor-track { transform: translate(81.5%, 79.5%); }
-  .ed-tl .head-rail { transform: translateX(40%); }
-  .a-speed .ph { transform: translateX(50%); }
-  .canvas, .rec, .bgs i, .tabs-hl.ready { transition-duration: 0ms; }
+  .tabs-hl.ready, .media, .media video, .media-ph { transition-duration: 0ms; }
   .js .reveal { transform: none; filter: none; transition: opacity 300ms ease; }
   .stage-scroll { height: auto; padding-bottom: 96px; }
   .stage-sticky { position: static; height: auto; }
@@ -722,145 +511,101 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
         <p class="reveal" style="--d:80ms">Record once and use your app the way you normally would. Demodrop takes care of the motion, the framing and the finishing touches, so the video looks deliberate instead of just captured.</p>
       </div>
 
-      <div class="showcase reveal" style="--d:120ms">
-        <div class="tabs auto" role="tablist" aria-label="See what Demodrop does">
-          <div class="tabs-hl" aria-hidden="true"></div>
-          <button class="tab" role="tab" aria-selected="true" data-mode="zoom" data-dur="7000">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3M7 5v4M5 7h4"/></svg>Auto-zoom<span class="prog"></span></button>
-          <button class="tab" role="tab" aria-selected="false" data-mode="cursor" data-dur="6400">
-            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 2v11l3-2.7 1.9 4.4 2-.9-1.9-4.3H12L3 2Z"/></svg>Cursor<span class="prog"></span></button>
-          <button class="tab" role="tab" aria-selected="false" data-mode="bg" data-dur="6400">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="2" width="12" height="12" rx="3"/><rect x="5" y="5" width="6" height="6" rx="1.2"/></svg>Background<span class="prog"></span></button>
-          <button class="tab" role="tab" aria-selected="false" data-mode="format" data-dur="6400">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="1.5" y="4" width="8" height="8" rx="1.5"/><rect x="11" y="2" width="3.5" height="12" rx="1.2"/></svg>Format<span class="prog"></span></button>
+      <!-- Chapter 1: auto-zoom -->
+      <div class="chapter">
+        <div class="ch-head reveal">
+          <span class="eyebrow"><i></i>Auto-zoom</span>
+          <h3 class="ch-title">Every click, <span class="serif">in focus.</span></h3>
+          <p>Demodrop watches where you click, zooms in on the moment that matters, then eases back out. There's nothing to keyframe.</p>
         </div>
-
-        <div class="editor-wrap">
-          <div class="editor-glow" aria-hidden="true"></div>
-          <div class="editor" id="editor" data-mode="zoom" data-bg="0" data-ratio="0" role="img" aria-label="The Demodrop editor: a recording zooms in on a click, the cursor is smoothed, the background changes and the video is reframed for different formats.">
-            <div class="ed-bar">
-              <div class="dots"><i></i><i></i><i></i></div>
-              <div class="file"><b>launch-demo</b> · Demodrop</div>
-              <div class="export">Export</div>
-            </div>
-
-            <div class="ed-canvas">
-              <div class="canvas">
-                <div class="bgs"><i></i><i></i><i></i><i></i></div>
-                <div class="rec">
-                  <div class="tb"><i></i><i></i><i></i></div>
-                  <div class="vp">
-                    <div class="screen">
-                      <div class="m-side"><div class="logo"></div><div class="item on"></div><div class="item"></div><div class="item"></div><div class="item"></div></div>
-                      <div class="m-top"><div class="search"></div><div class="avatar"></div></div>
-                      <div class="m-title">Releases</div>
-                      <div class="m-sub">Everything that shipped this month</div>
-                      <div class="m-card m-chart"><b style="height:38%"></b><b style="height:52%"></b><b style="height:44%"></b><b style="height:66%"></b><b style="height:58%"></b><b style="height:80%"></b><b style="height:92%"></b></div>
-                      <div class="m-card m-release"><span class="m-tag">Ready</span><div class="ver">v2.0</div><div class="ln"></div><div class="ln s"></div></div>
-                      <div class="m-btn"><span class="idle">Publish release</span><span class="done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Published</span></div>
-                      <div class="ripple"></div>
-                      <div class="cursor-track"><svg viewBox="0 0 24 32" aria-hidden="true"><path d="M1.5 1.5v24.2l6.1-5.6 3.9 9.4 4.4-1.9-3.9-9.2h8.5L1.5 1.5Z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
-                    </div>
-                    <svg class="cur-ov" viewBox="0 0 160 95" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-                      <defs><linearGradient id="sm" x1="0" x2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#bdbac6"/></linearGradient></defs>
-                      <path d="M20 78 L25 73 L23 69 L30 66 L33 59 L31 55 L39 51 L44 45 L42 41 L51 39 L57 34 L63 36 L71 31 L78 33 L85 29 L92 34 L98 31 L106 37 L111 35 L117 42 L124 44" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="0.6" stroke-dasharray="1.4 1.4"/>
-                      <text class="lbl" x="34" y="72" fill="rgba(255,255,255,0.6)">RAW</text>
-                      <path class="smooth" pathLength="1" d="M20 78 C 40 48, 58 30, 88 31 S 118 42, 124 44" fill="none" stroke="url(#sm)" stroke-width="1.3" stroke-linecap="round"/>
-                      <text class="lbl" x="70" y="26" fill="#ffffff">SMOOTHED</text>
-                      <circle class="end" cx="124" cy="44" r="5" fill="none" stroke="#fff" stroke-width="0.7"/>
-                      <g>
-                        <animateMotion dur="3.2s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.75;1" keyPoints="0;1;1" keySplines=".45 0 .2 1;0 0 1 1" path="M20 78 C 40 48, 58 30, 88 31 S 118 42, 124 44"/>
-                        <path transform="scale(0.17)" d="M1.5 1.5v24.2l6.1-5.6 3.9 9.4 4.4-1.9-3.9-9.2h8.5L1.5 1.5Z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/>
-                      </g>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <aside class="ed-insp" aria-hidden="true">
-              <div class="panel" data-for="zoom">
-                <div class="p-h">Zoom</div>
-                <div class="p-row">Auto-zoom on clicks <span class="toggle"></span></div>
-                <div class="p-block"><div class="top">Zoom level <span class="v">1.85×</span></div><div class="slider"><b style="width:56%"></b></div></div>
-                <div class="p-row">Easing <span class="v">Smooth</span></div>
-                <div class="p-row">Zooms found <span class="v">1 click · 0:02</span></div>
-              </div>
-              <div class="panel" data-for="cursor">
-                <div class="p-h">Cursor</div>
-                <div class="p-block"><div class="top">Size <span class="v">1.4×</span></div><div class="slider"><b style="width:44%"></b></div></div>
-                <div class="p-row">Smooth movement <span class="toggle"></span></div>
-                <div class="p-row">Click ripple <span class="toggle"></span></div>
-                <div class="p-row">Hide when idle <span class="toggle"></span></div>
-              </div>
-              <div class="panel" data-for="bg">
-                <div class="p-h">Background</div>
-                <div class="sw"><i></i><i></i><i></i><i></i></div>
-                <div class="p-block"><div class="top">Padding <span class="v">16%</span></div><div class="slider"><b style="width:52%"></b></div></div>
-                <div class="p-block"><div class="top">Corners <span class="v">14 px</span></div><div class="slider"><b style="width:38%"></b></div></div>
-                <div class="p-row">Shadow <span class="toggle"></span></div>
-              </div>
-              <div class="panel" data-for="format">
-                <div class="p-h">Format</div>
-                <div class="ratios"><span><i></i>16:9</span><span><i></i>1:1</span><span><i></i>9:16</span></div>
-                <div class="p-block" style="border-bottom:0"><div class="top">Export as</div><div class="seg"><span class="on">MP4</span><span>GIF</span></div></div>
-              </div>
-            </aside>
-
-            <div class="ed-tl" aria-hidden="true">
-              <span class="lab">Video</span>
-              <div class="tracks">
-                <div class="row"><div class="clip"></div></div>
-                <div class="row"><div class="blk z">Zoom 1.85×</div><div class="click"></div><div class="blk sp">4×</div></div>
-                <div class="head-rail"></div>
-              </div>
-              <span class="lab">Effects</span>
-            </div>
+        <div class="ch-tabs reveal">
+          <div class="tabs" role="tablist" aria-label="Auto-zoom clips">
+            <div class="tabs-hl" aria-hidden="true"></div>
+            <button class="tab" role="tab" aria-selected="true">Auto-zoom<span class="prog"></span></button>
+            <button class="tab" role="tab" aria-selected="false">Edit on the timeline<span class="prog"></span></button>
           </div>
         </div>
+        <div class="ch-media reveal">
+          <figure class="media on" data-src="/assets/features/zoom.mp4" data-poster="/assets/features/zoom.jpg" data-label="Auto-zoom on every click"></figure>
+          <figure class="media" data-src="/assets/features/zoom-timeline.mp4" data-poster="/assets/features/zoom-timeline.jpg" data-label="Editing zooms on the timeline"></figure>
+        </div>
+        <ul class="notes reveal">
+          <li><b>Automatic</b><span>Every click becomes a smooth zoom, with no setup.</span></li>
+          <li><b>Editable</b><span>Drag, resize or delete any zoom block, or add your own.</span></li>
+          <li><b>1.2× to 3×</b><span>Choose how close each zoom gets.</span></li>
+        </ul>
+      </div>
 
-      <div class="cells">
-        <article class="cell reveal">
-          <div class="art"><div class="a-zoom" aria-hidden="true">
-            <div class="clicks"><i style="left:8%"></i><i style="left:46%"></i></div>
-            <div class="row"><span class="b b1">1.5×</span><span class="b b2">2×</span></div>
-          </div></div>
-          <h3>Zooms you can edit</h3>
-          <p>Every click becomes a zoom block on the timeline. Drag it, resize it, change the zoom level, or add your own.</p>
-        </article>
-        <article class="cell reveal" style="--d:60ms">
-          <div class="art"><div class="a-click" aria-hidden="true"><span class="ring"></span><span class="ring r2"></span>
-            <svg viewBox="0 0 24 32"><path d="M1.5 1.5v24.2l6.1-5.6 3.9 9.4 4.4-1.9-3.9-9.2h8.5L1.5 1.5Z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg></div></div>
-          <h3>Click ripples</h3>
-          <p>A soft ripple marks each click so viewers can follow along. The cursor hides itself when you stop moving.</p>
-        </article>
-        <article class="cell reveal" style="--d:120ms">
-          <div class="art"><div class="a-speed" aria-hidden="true">
-            <div class="bar"><span class="s s1"></span><span class="s s2">4×</span><span class="s s3"></span><span class="ph"></span></div>
-            <div class="t"><span>0:00</span><span>0:42</span></div>
-          </div></div>
-          <h3>Speed-ups</h3>
-          <p>Fast-forward through loading screens and typing so the video keeps moving.</p>
-        </article>
-        <article class="cell reveal">
-          <div class="art"><div class="a-blur" aria-hidden="true">
-            <div class="r"><span class="k">Workspace</span><span>Acme Studio</span></div>
-            <div class="r"><span class="k">Email</span><span class="m"><span>jordan@acme.io</span></span></div>
-            <div class="r"><span class="k">API key</span><span class="m"><span>sk_9f2c71ab03de</span></span></div>
-          </div></div>
-          <h3>Blur masks</h3>
-          <p>Hide emails, keys and customer data before you share anything.</p>
-        </article>
-        <article class="cell reveal" style="--d:60ms">
-          <div class="art"><div class="a-src" aria-hidden="true"><span class="w w1"></span><span class="w w2"></span></div></div>
-          <h3>A screen or one window</h3>
-          <p>Record your whole display or a single app window at full resolution.</p>
-        </article>
-        <article class="cell reveal" style="--d:120ms">
-          <div class="art"><div class="a-exp" aria-hidden="true"><div class="f"><b>MP4</b>demo.mp4</div><div class="f gif"><b>GIF</b>demo.gif</div></div></div>
-          <h3>MP4 or GIF</h3>
-          <p>Export an MP4 that's ready to post, or a GIF for READMEs, docs and chats.</p>
-        </article>
+      <!-- Chapter 2: cursor -->
+      <div class="chapter">
+        <div class="ch-head reveal">
+          <span class="eyebrow"><i></i>Cursor</span>
+          <h3 class="ch-title">A cursor that looks <span class="serif">filmed.</span></h3>
+          <p>Demodrop records without the pointer, then the editor draws a crisp, smoothed one, so it stays sharp at any zoom.</p>
+        </div>
+        <div class="ch-media reveal">
+          <figure class="media on" data-src="/assets/features/cursor.mp4" data-poster="/assets/features/cursor.jpg" data-label="The smoothed cursor and click ripples" data-loop></figure>
+        </div>
+        <ul class="notes reveal">
+          <li><b>Smoothed</b><span>Shaky movement becomes a steady glide.</span></li>
+          <li><b>Click ripples</b><span>A soft ring marks every click so viewers can follow along.</span></li>
+          <li><b>Hides when idle</b><span>It steps out of view when you stop moving, at whatever size you choose.</span></li>
+        </ul>
+      </div>
+
+      <!-- Chapter 3: framing -->
+      <div class="chapter">
+        <div class="ch-head reveal">
+          <span class="eyebrow"><i></i>Framing</span>
+          <h3 class="ch-title">Frame it once. <span class="serif">Post it anywhere.</span></h3>
+          <p>Put your recording on a background, round the corners, add a shadow, then reframe it for the feed in one click.</p>
+        </div>
+        <div class="ch-tabs reveal">
+          <div class="tabs" role="tablist" aria-label="Framing clips">
+            <div class="tabs-hl" aria-hidden="true"></div>
+            <button class="tab" role="tab" aria-selected="true">Backgrounds<span class="prog"></span></button>
+            <button class="tab" role="tab" aria-selected="false">Formats<span class="prog"></span></button>
+          </div>
+        </div>
+        <div class="ch-media reveal">
+          <figure class="media on" data-src="/assets/features/backgrounds.mp4" data-poster="/assets/features/backgrounds.jpg" data-label="Switching backgrounds, padding and corners"></figure>
+          <figure class="media" data-src="/assets/features/formats.mp4" data-poster="/assets/features/formats.jpg" data-label="Reframing to 16:9, 1:1 and 9:16"></figure>
+        </div>
+        <ul class="notes reveal">
+          <li><b>Gradient wallpapers</b><span>Pick a backdrop that suits your product.</span></li>
+          <li><b>Padding, corners, shadow</b><span>Frame the recording so it looks deliberate.</span></li>
+          <li><b>16:9, 1:1, 9:16</b><span>Landscape, square or vertical, from the same recording.</span></li>
+        </ul>
+      </div>
+
+      <!-- Chapter 4: finishing touches -->
+      <div class="chapter">
+        <div class="ch-head reveal">
+          <span class="eyebrow"><i></i>Finishing touches</span>
+          <h3 class="ch-title">The last 10%, <span class="serif">done in seconds.</span></h3>
+        </div>
+        <div class="finish">
+          <article class="fcard reveal">
+            <div class="card-media"><figure class="media on" data-src="/assets/features/speed.mp4" data-poster="/assets/features/speed.jpg" data-label="Speed-ups" data-loop></figure></div>
+            <h4>Speed-ups</h4>
+            <p>Fast-forward through loading screens and typing so the video keeps moving.</p>
+          </article>
+          <article class="fcard reveal" style="--d:60ms">
+            <div class="card-media"><figure class="media on" data-src="/assets/features/blur.mp4" data-poster="/assets/features/blur.jpg" data-label="Blur masks" data-loop></figure></div>
+            <h4>Blur masks</h4>
+            <p>Hide emails, keys and customer data before you share anything.</p>
+          </article>
+          <article class="fcard reveal">
+            <div class="card-media"><figure class="media on" data-src="/assets/features/record.mp4" data-poster="/assets/features/record.jpg" data-label="Choosing what to record" data-loop></figure></div>
+            <h4>A screen or one window</h4>
+            <p>Record your whole display or a single app window at full resolution, after a 3-2-1 countdown.</p>
+          </article>
+          <article class="fcard reveal" style="--d:60ms">
+            <div class="card-media"><figure class="media on" data-src="/assets/features/export.mp4" data-poster="/assets/features/export.jpg" data-label="Exporting MP4 or GIF" data-loop></figure></div>
+            <h4>MP4 or GIF</h4>
+            <p>Export an MP4 that's ready to post, or a GIF for READMEs, docs and chats.</p>
+          </article>
+        </div>
       </div>
 
       <div class="steps">
@@ -1018,82 +763,115 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
   addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  // Showcase tabs: auto-advance until the visitor picks one; pause while off screen.
-  var editor = document.getElementById("editor");
-  var tablist = document.querySelector(".tabs");
-  var tabs = [].slice.call(tablist.querySelectorAll(".tab"));
-  var hl = tablist.querySelector(".tabs-hl");
-  var copies = tabs.map(function (t) {
-    var s = document.createElement("span");
-    s.className = "tab";
-    s.innerHTML = t.innerHTML;
-    hl.appendChild(s);
-    return s;
+  // Feature media: product clips load when they come near the viewport and play only while visible.
+  // A slot whose clip is missing keeps its placeholder, so the page never shows a broken video.
+  var PH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9.5 4.5 2.5-4.5 2.5z" fill="currentColor"/></svg>';
+  var medias = [].slice.call(document.querySelectorAll(".media"));
+  medias.forEach(function (m) {
+    m.innerHTML = '<div class="media-ph"><span class="ph-ic">' + PH_ICON + '</span><b></b><span>Product clip coming soon</span></div>';
+    m.querySelector("b").textContent = m.dataset.label || "";
+    var v = document.createElement("video");
+    v.muted = true; v.playsInline = true; v.preload = "none";
+    v.setAttribute("muted", ""); v.setAttribute("playsinline", "");
+    v.loop = m.hasAttribute("data-loop");
+    v.setAttribute("aria-label", m.dataset.label || "");
+    m.appendChild(v);
+    m._v = v;
+    v.addEventListener("loadeddata", function () { m.classList.add("ready"); });
+    v.addEventListener("error", function () { m.classList.add("missing"); }, true);
   });
-  var current = 0, timer = null, sub = null, auto = !reduce, visible = true;
-
-  function placeIndicator() {
-    var t = tabs[current];
-    var left = t.offsetLeft, right = hl.offsetWidth - left - t.offsetWidth;
-    hl.style.clipPath = "inset(4px " + right + "px 4px " + left + "px round 999px)";
-    copies.forEach(function (c, j) { c.classList.toggle("on", j === current); });
+  function load(m) {
+    if (m._loaded) return;
+    m._loaded = true;
+    if (m.dataset.poster) m._v.poster = m.dataset.poster;
+    var s = document.createElement("source");
+    s.src = m.dataset.src; s.type = "video/mp4";
+    s.addEventListener("error", function () { m.classList.add("missing"); });
+    m._v.appendChild(s);
+    m._v.load();
   }
-  function runSub(mode) {
-    clearInterval(sub); sub = null;
-    if (reduce) return;
-    if (mode === "bg") {
-      var i = 0;
-      sub = setInterval(function () { i = (i + 1) % 4; editor.dataset.bg = i; }, 1500);
-    } else if (mode === "format") {
-      var r = 0;
-      sub = setInterval(function () { r = (r + 1) % 3; editor.dataset.ratio = r; }, 1900);
-    }
+  function playIfShown(m) {
+    if (reduce || !m._inView || !m.classList.contains("on")) { m._v.pause(); return; }
+    var p = m._v.play(); if (p && p.catch) p.catch(function () {});
   }
-  function select(i, fromUser) {
-    current = i;
-    tabs.forEach(function (t, j) { t.setAttribute("aria-selected", j === i ? "true" : "false"); t.tabIndex = j === i ? 0 : -1; });
-    var mode = tabs[i].dataset.mode;
-    editor.dataset.mode = mode;
-    editor.dataset.bg = "0"; editor.dataset.ratio = "0";
-    placeIndicator();
-    runSub(mode);
-    if (fromUser) { auto = false; tablist.classList.remove("auto"); }
-    schedule();
-  }
-  function schedule() {
-    clearTimeout(timer);
-    if (!auto || !visible) return;
-    var dur = +tabs[current].dataset.dur;
-    tablist.style.setProperty("--dur", dur + "ms");
-    // Restart the progress bar on the active tab.
-    var p = copies[current].querySelector(".prog");
-    p.style.display = "none"; void p.offsetWidth; p.style.display = "";
-    timer = setTimeout(function () { select((current + 1) % tabs.length, false); }, dur);
-  }
-  tabs.forEach(function (t, i) {
-    t.addEventListener("click", function () { select(i, true); });
-    t.addEventListener("keydown", function (e) {
-      var d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
-      if (!d) return;
-      e.preventDefault();
-      var n = (current + d + tabs.length) % tabs.length;
-      select(n, true); tabs[n].focus();
-    });
-  });
-  if (!auto) tablist.classList.remove("auto");
-  addEventListener("resize", placeIndicator);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeIndicator);
   if ("IntersectionObserver" in window) {
-    new IntersectionObserver(function (es) {
-      visible = es[0].isIntersecting;
-      if (visible) schedule(); else clearTimeout(timer);
-    }).observe(editor);
+    var near = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { load(e.target); near.unobserve(e.target); } });
+    }, { rootMargin: "400px 0px" });
+    var seen = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { e.target._inView = e.isIntersecting; playIfShown(e.target); });
+    }, { threshold: 0.35 });
+    medias.forEach(function (m) { near.observe(m); seen.observe(m); });
+  } else {
+    medias.forEach(function (m) { load(m); m._inView = true; playIfShown(m); });
   }
-  select(0, false);
-  // Commit the first placement (forced style flush), then enable the slide,
-  // so the pill doesn't animate in from the left edge on load.
-  getComputedStyle(hl).clipPath;
-  hl.classList.add("ready");
+  if (reduce) medias.forEach(function (m) { m._v.controls = true; });
+
+  // Chapter tabs (clip-path pill): each tab shows one clip; tabs advance when a clip ends until the visitor picks one.
+  [].slice.call(document.querySelectorAll(".chapter")).forEach(function (ch) {
+    var list = ch.querySelector(".tabs");
+    if (!list) return;
+    var tabs = [].slice.call(list.querySelectorAll(":scope > .tab"));
+    var hl = list.querySelector(".tabs-hl");
+    var slots = [].slice.call(ch.querySelectorAll(".ch-media .media"));
+    var copies = tabs.map(function (t) {
+      var s = document.createElement("span");
+      s.className = "tab";
+      s.innerHTML = t.innerHTML;
+      hl.appendChild(s);
+      return s;
+    });
+    var cur = 0, auto = !reduce;
+    if (auto) list.classList.add("auto");
+
+    function place() {
+      var t = tabs[cur];
+      var left = t.offsetLeft, right = hl.offsetWidth - left - t.offsetWidth;
+      hl.style.clipPath = "inset(4px " + right + "px 4px " + left + "px round 999px)";
+      copies.forEach(function (c, j) { c.classList.toggle("on", j === cur); });
+    }
+    function restartProg() {
+      var p = copies[cur].querySelector(".prog");
+      p.style.display = "none"; void p.offsetWidth; p.style.display = "";
+      var v = slots[cur]._v;
+      list.style.setProperty("--dur", (v.duration ? v.duration : 8) + "s");
+    }
+    function select(i, fromUser) {
+      cur = i;
+      tabs.forEach(function (t, j) { t.setAttribute("aria-selected", j === i ? "true" : "false"); t.tabIndex = j === i ? 0 : -1; });
+      slots.forEach(function (m, j) {
+        m.classList.toggle("on", j === i);
+        if (j === i) { load(m); try { m._v.currentTime = 0; } catch (e) {} }
+        playIfShown(m);
+      });
+      if (fromUser && auto) { auto = false; list.classList.remove("auto"); }
+      place();
+      restartProg();
+    }
+    slots.forEach(function (m, j) {
+      m._v.addEventListener("ended", function () {
+        if (auto) select((j + 1) % slots.length, false);
+        else { m._v.currentTime = 0; playIfShown(m); }
+      });
+      m._v.addEventListener("loadedmetadata", function () { if (j === cur) restartProg(); });
+    });
+    tabs.forEach(function (t, i) {
+      t.addEventListener("click", function () { select(i, true); });
+      t.addEventListener("keydown", function (e) {
+        var d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        var n = (cur + d + tabs.length) % tabs.length;
+        select(n, true); tabs[n].focus();
+      });
+    });
+    addEventListener("resize", place);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+    select(0, false);
+    // Commit the first placement before enabling the slide (forced style flush, not rAF).
+    getComputedStyle(hl).clipPath;
+    hl.classList.add("ready");
+  });
 
   // Hero stage: the video grows from a tilted card to near full screen while the page dims around it.
   var hv = document.getElementById("heroVideo");
