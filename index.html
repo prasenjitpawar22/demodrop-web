@@ -110,7 +110,9 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 }
 
 /* ---------- Hero ---------- */
-.hero { position: relative; padding: 148px 0 0; text-align: center; overflow: hidden; }
+.hero { position: relative; text-align: center; overflow: hidden; }
+/* The hero's padding lives on the zoom layer, so the grid and copy zoom as one recording */
+.rec-zoom { position: relative; padding: 148px 0 24px; transform-origin: 0 0; }
 .hero-grid {
   position: absolute; inset: 0; pointer-events: none;
   background-image:
@@ -123,7 +125,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 }
 .hero-blob { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; }
 .hero-blob { display: none; }
-.hero > .inner { position: relative; }
+.hero .inner { position: relative; }
 
 .badge {
   display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px 0 6px;
@@ -527,6 +529,8 @@ section { position: relative; }
 .dl-grid { margin-top: 52px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; text-align: left; }
 .dl { border-radius: 20px; padding: 30px; background: var(--panel); box-shadow: 0 0 0 1px var(--line), 0 1px 2px rgba(17,16,22,0.04); display: flex; flex-direction: column; }
 .dl.featured { box-shadow: 0 0 0 1px rgba(17,16,22,0.5), 0 30px 60px -36px rgba(17,16,22,0.35); }
+/* A lone card (Windows, while macOS is hidden) sits centred instead of in the left half */
+.dl-grid > .dl:only-child { grid-column: 1 / -1; justify-self: center; width: 100%; max-width: 560px; }
 .dl .os { display: flex; align-items: center; gap: 12px; }
 .dl .os svg { width: 26px; height: 26px; }
 .dl h3 { margin: 0; font-size: 22px; letter-spacing: -0.02em; font-weight: 600; }
@@ -538,6 +542,8 @@ section { position: relative; }
 .note { margin-top: 20px; display: flex; gap: 11px; padding: 13px 15px; border-radius: 12px; background: var(--bg); box-shadow: inset 0 0 0 1px var(--line); font-size: 14px; color: var(--muted); line-height: 1.55; }
 .note svg { width: 17px; height: 17px; flex: none; margin-top: 2px; color: #c98a10; }
 .note b { color: var(--ink); font-weight: 600; }
+.note.alt svg { color: var(--muted); }
+.note a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-2); }
 kbd { font: 500 12.5px/1 "Geist", sans-serif; padding: 3px 7px; border-radius: 6px; background: var(--panel); box-shadow: 0 0 0 1px var(--line-2), 0 1px 0 var(--line-2); color: var(--ink); white-space: nowrap; }
 
 /* ---------- FAQ ---------- */
@@ -587,7 +593,7 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
 @media (max-width: 720px) {
   .nav-links a:not(.btn) { display: none; }
   .nav.scrolled .nav-inner { max-width: 100%; }
-  .hero { padding-top: 112px; }
+  .rec-zoom { padding-top: 112px; }
   /* Phones: no pinning or growth, just the framed video */
   .stage-scroll { height: auto; width: auto; margin: 40px 0 0; padding: 0 16px 64px; }
   .stage-sticky { position: static; height: auto; overflow: visible; }
@@ -641,6 +647,74 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
   .cta-row .btn { width: 100%; }
 }
 
+/* ---------- Hero recorder ----------
+   Point at the hero and Demodrop starts recording you: viewfinder corners, a REC
+   chip, a smoothed "filmed" cursor, a zoom on every click, and the headline turns
+   to dust under the cursor. Desktop with a mouse only; see the script at the end. */
+.hero[data-rec="on"], .hero[data-rec="on"] * { cursor: none; }
+
+.dust-wrap { position: relative; }
+/* Bleeds well past the headline, mostly up and to the right where the wind blows */
+.dust { position: absolute; left: -120px; top: -140px; width: calc(100% + 360px); height: calc(100% + 200px); pointer-events: none; z-index: 1; }
+/* The canvas draws the headline once it's ready; the real text stays for reading and selecting */
+.dust-wrap h1[data-ready], .dust-wrap h1[data-ready] span { color: transparent; }
+
+.rec-chrome { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.rec-corner {
+  position: absolute; width: 22px; height: 22px; border: 0 solid var(--ink); opacity: 0;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+.rec-corner.tl { top: 80px; left: 16px; border-top-width: 1.5px; border-left-width: 1.5px; border-top-left-radius: 5px; transform: translate(-8px, -8px); }
+.rec-corner.tr { top: 80px; right: 16px; border-top-width: 1.5px; border-right-width: 1.5px; border-top-right-radius: 5px; transform: translate(8px, -8px); }
+.rec-corner.bl { bottom: 12px; left: 16px; border-bottom-width: 1.5px; border-left-width: 1.5px; border-bottom-left-radius: 5px; transform: translate(-8px, 8px); }
+.rec-corner.br { bottom: 12px; right: 16px; border-bottom-width: 1.5px; border-right-width: 1.5px; border-bottom-right-radius: 5px; transform: translate(8px, 8px); }
+.hero[data-rec="on"] .rec-corner { opacity: 1; transform: none; transition: opacity 240ms var(--ease-out), transform 320ms var(--ease-out); }
+.hero[data-rec="on"] .rec-corner.tr, .hero[data-rec="on"] .rec-corner.bl { transition-delay: 30ms; }
+.hero[data-rec="on"] .rec-corner.br { transition-delay: 60ms; }
+
+/* REC chip; when the take ends it turns into the saved-take chip in the same spot */
+.rec-chip {
+  position: absolute; top: 86px; left: 48px; display: flex; align-items: center;
+  height: 28px; padding: 0 11px; border-radius: 999px;
+  background: rgba(255,255,255,0.85); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  box-shadow: 0 0 0 1px var(--line-2), 0 2px 8px -2px rgba(17,16,22,0.12);
+  font-size: 12px; font-weight: 500; color: var(--ink);
+  opacity: 0; transform: translateY(-4px); transition: opacity 160ms ease, transform 160ms ease;
+}
+.hero[data-rec="on"] .rec-chip, .hero[data-rec="saved"] .rec-chip { opacity: 1; transform: none; transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out); }
+.rec-live, .rec-saved { display: flex; align-items: center; gap: 7px; }
+.rec-saved { display: none; }
+.hero[data-rec="saved"] .rec-live { display: none; }
+.hero[data-rec="saved"] .rec-saved { display: flex; }
+.rec-dot { width: 7px; height: 7px; border-radius: 50%; background: #e5484d; box-shadow: 0 0 0 3px rgba(229,72,77,0.18); }
+.hero[data-rec="on"] .rec-dot { animation: rec-blink 1.2s ease-in-out infinite; }
+@keyframes rec-blink { 50% { opacity: 0.35; } }
+.rec-label { letter-spacing: 0.06em; font-size: 11px; }
+.rec-time, .rec-file { font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.rec-file { color: var(--muted); }
+.rec-saved svg { width: 13px; height: 13px; color: #2f8f4e; }
+
+.rec-ripple {
+  position: absolute; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%;
+  border: 1.5px solid rgba(17,16,22,0.5); background: rgba(17,16,22,0.06);
+  animation: rec-ripple 480ms var(--ease-out) forwards;
+}
+@keyframes rec-ripple { from { opacity: 1; transform: scale(0.35); } to { opacity: 0; transform: scale(1.4); } }
+
+/* The filmed cursor. Its origin is the hotspot; each glyph is offset so its own tip sits on it */
+.rec-cursor { position: absolute; top: 0; left: 0; width: 0; height: 0; display: none; will-change: transform; filter: drop-shadow(0 2px 3px rgba(17,16,22,0.28)); }
+.hero[data-rec="on"] .rec-cursor { display: block; }
+.rec-glyphs { position: absolute; transition: opacity 260ms ease, transform 260ms var(--ease-out); }
+.rec-cursor[data-hidden] .rec-glyphs { opacity: 0; transform: scale(0.85); transition-duration: 160ms; }
+.rec-cursor svg { position: absolute; display: block; max-width: none; transition: opacity 120ms ease-out, transform 160ms var(--ease-out), filter 120ms ease-out; }
+.rec-arrow { left: -4px; top: -2.5px; transform-origin: 4px 2.5px; }
+.rec-hand { left: -9px; top: -2.5px; transform-origin: 9px 2.5px; opacity: 0; transform: scale(0.9); filter: blur(1px); }
+/* Arrow to hand: a quick crossfade on the same hotspot, never two cursors */
+.rec-cursor[data-link] .rec-arrow { opacity: 0; transform: scale(0.9); filter: blur(1px); }
+.rec-cursor[data-link] .rec-hand { opacity: 1; transform: none; filter: none; }
+
+.rec-announce { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
 @media (prefers-reduced-motion: reduce) {
   .enter { animation: fade 300ms ease both; }
   @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
@@ -672,25 +746,51 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
 
 <div class="page" id="top">
 <main>
-  <section class="hero">
+  <section class="hero" id="hero">
+    <!-- The recording: everything the camera can zoom into -->
+    <div class="rec-zoom">
     <div class="hero-grid" aria-hidden="true"></div>
     <div class="hero-blob a" aria-hidden="true"></div>
     <div class="hero-blob b" aria-hidden="true"></div>
     <div class="inner">
-      <a class="badge enter" href="#download"><b>Free</b> Windows beta · macOS preview
+      <!-- macOS hidden until it's been tested on a real Mac. Was: "Windows beta · macOS preview" -->
+      <a class="badge enter" href="#download"><b>Free</b> Windows beta
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5"/></svg></a>
-      <h1 class="enter d1">Screen recordings, <span class="serif grad-text">already edited.</span></h1>
+      <div class="dust-wrap">
+        <h1 class="enter d1">Screen recordings, <span class="serif grad-text">already edited.</span></h1>
+        <canvas class="dust" aria-hidden="true"></canvas>
+      </div>
       <p class="lede enter d2">Record your screen. Demodrop adds the zooms, the cursor and the background for you.</p>
       <div class="cta-row enter d4" id="hero-cta">
-        <a class="btn btn-dark" data-os="win" href="https://github.com/prasenjitpawar22/demodrop-releases/releases/latest/download/Demodrop-Setup.exe">
+        <a class="btn btn-dark" data-os="win" href="https://apps.microsoft.com/detail/9NJL8GX94KLS">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5 10.5 4.4v7.1H3V5.5Zm0 13 7.5 1.1v-7H3v5.9Zm8.4 1.2L21 21v-8.4h-9.6v7.1Zm0-15.4v7.2H21V3l-9.6 1.3Z"/></svg>
           Download for Windows</a>
+        <!-- macOS hidden until it's been tested on a real Mac
         <a class="btn btn-light" data-os="mac" href="https://github.com/prasenjitpawar22/demodrop-releases/releases/latest/download/Demodrop-mac.dmg">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.8 1.2 1.8 2.6 3.1 2.5 1.3 0 1.7-.8 3.3-.8 1.5 0 1.9.8 3.3.8 1.4 0 2.2-1.2 3-2.4 1-1.4 1.3-2.7 1.4-2.8-.1 0-2.7-1-2.7-4.2ZM13.9 5c.7-.8 1.2-2 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.4Z"/></svg>
           macOS <small>preview</small></a>
+        -->
       </div>
       <p class="micro enter d5">Free · No account · Runs entirely on your computer</p>
     </div>
+    </div>
+
+    <!-- Recorder chrome: sits above the recording and never zooms with it -->
+    <div class="rec-chrome" aria-hidden="true">
+      <span class="rec-corner tl"></span><span class="rec-corner tr"></span>
+      <span class="rec-corner bl"></span><span class="rec-corner br"></span>
+      <div class="rec-chip">
+        <span class="rec-live"><span class="rec-dot"></span><span class="rec-label">REC</span><span class="mono rec-time">00:00</span></span>
+        <span class="rec-saved"><svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Saved <span class="mono rec-file">take-0412.mp4 · 00:00</span></span>
+      </div>
+      <div class="rec-cursor">
+        <div class="rec-glyphs">
+          <svg class="rec-arrow" viewBox="0 0 24 24" width="24" height="24"><path d="M4 2.5v17l4.6-4.3 3 6.6 3-1.3-3-6.5h6.4L4 2.5Z" fill="#fff" stroke="#111016" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <svg class="rec-hand" viewBox="0 0 24 24" width="24" height="24"><path d="M9 2.5c-1 0-1.75.8-1.75 1.8v8.2l-1.3-1.35c-.7-.7-1.8-.75-2.5-.1-.7.65-.7 1.7-.05 2.4l4.1 4.6c1.1 1.25 2.6 2 4.3 2h2.6c2.9 0 5.1-2.3 5.1-5.1v-4.1c0-.95-.75-1.7-1.7-1.7-.5 0-.9.2-1.2.5v-.4c0-.95-.75-1.7-1.7-1.7-.55 0-1 .25-1.3.6-.2-.8-.9-1.35-1.7-1.35-.4 0-.75.12-1.05.33V4.3c0-1-.75-1.8-1.75-1.8Z" fill="#fff" stroke="#111016" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </div>
+    <span class="rec-announce" aria-live="polite"></span>
   </section>
 
   <div class="stage-scroll" id="stageScroll">
@@ -959,7 +1059,7 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
       <div class="center reveal">
         <span class="eyebrow"><i></i>Download</span>
         <h2 class="h2">Free. <span class="serif">Right now.</span></h2>
-        <p class="sub">One installer. No account, no trial, no watermark.</p>
+        <p class="sub">No account, no trial, no watermark.</p>
       </div>
       <div class="dl-grid">
         <div class="dl featured reveal" data-card="win">
@@ -967,15 +1067,16 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5 10.5 4.4v7.1H3V5.5Zm0 13 7.5 1.1v-7H3v5.9Zm8.4 1.2L21 21v-8.4h-9.6v7.1Zm0-15.4v7.2H21V3l-9.6 1.3Z"/></svg>
             <h3>Windows</h3><span class="tag beta">Beta</span>
           </div>
-          <p class="req">Windows 10 (version 2004) or newer, 64-bit.</p>
-          <a class="btn btn-dark" href="https://github.com/prasenjitpawar22/demodrop-releases/releases/latest/download/Demodrop-Setup.exe">
+          <p class="req">Windows 10 (version 2004) or newer, 64-bit. From the Microsoft Store it installs without warnings and updates itself.</p>
+          <a class="btn btn-dark" href="https://apps.microsoft.com/detail/9NJL8GX94KLS">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5 10.5 4.4v7.1H3V5.5Zm0 13 7.5 1.1v-7H3v5.9Zm8.4 1.2L21 21v-8.4h-9.6v7.1Zm0-15.4v7.2H21V3l-9.6 1.3Z"/></svg>
+            Get it from Microsoft Store</a>
+          <div class="note alt">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></svg>
-            Download Demodrop-Setup.exe</a>
-          <div class="note">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
-            <div><b>Not code-signed yet.</b> If Windows SmartScreen says it protected your PC, click <kbd>More info</kbd> → <kbd>Run anyway</kbd>.</div>
+            <div><b>Prefer an installer?</b> <a href="https://github.com/prasenjitpawar22/demodrop-releases/releases/latest/download/Demodrop-Setup.exe">Download Demodrop-Setup.exe</a>. It isn't code-signed yet, so if SmartScreen says it protected your PC, click <kbd>More info</kbd> → <kbd>Run anyway</kbd>.</div>
           </div>
         </div>
+        <!-- macOS hidden until it's been tested on a real Mac
         <div class="dl reveal" style="--d:80ms" data-card="mac">
           <div class="os">
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.8 1.2 1.8 2.6 3.1 2.5 1.3 0 1.7-.8 3.3-.8 1.5 0 1.9.8 3.3.8 1.4 0 2.2-1.2 3-2.4 1-1.4 1.3-2.7 1.4-2.8-.1 0-2.7-1-2.7-4.2ZM13.9 5c.7-.8 1.2-2 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.4Z"/></svg>
@@ -990,6 +1091,7 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
             <div><b>Not code-signed yet.</b> If macOS won't open it, go to <kbd>System Settings</kbd> → <kbd>Privacy &amp; Security</kbd> and choose <kbd>Open Anyway</kbd>.</div>
           </div>
         </div>
+        -->
       </div>
     </div>
   </section>
@@ -1014,12 +1116,14 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
         </details>
         <details>
           <summary>Why does Windows warn me when I install it?<span class="pm" aria-hidden="true"></span></summary>
-          <p>The installer isn't code-signed yet, so SmartScreen doesn't recognize it. Click <kbd>More info</kbd> → <kbd>Run anyway</kbd> to continue. Signing is planned.</p>
+          <p>Only the direct installer warns. Get Demodrop from the <a href="https://apps.microsoft.com/detail/9NJL8GX94KLS">Microsoft Store</a> and it installs without a warning and keeps itself up to date. The installer from GitHub isn't code-signed yet, so SmartScreen doesn't recognize it: click <kbd>More info</kbd> → <kbd>Run anyway</kbd> to continue.</p>
         </details>
+        <!-- macOS hidden until it's been tested on a real Mac
         <details>
           <summary>Does it work on a Mac?<span class="pm" aria-hidden="true"></span></summary>
           <p>There's a macOS preview build, but it hasn't been tested on real hardware yet. Windows is the main platform for now.</p>
         </details>
+        -->
         <details>
           <summary>What can I export?<span class="pm" aria-hidden="true"></span></summary>
           <p>MP4 or GIF, in 16:9, 1:1 or 9:16. MP4 is best for posting on X, and GIF works well in READMEs, docs and chats.</p>
@@ -1039,7 +1143,8 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
       <img src="/assets/icon.png" alt="" width="88" height="88">
       <h2 class="h2">Your next demo is one <span class="serif grad-text">recording away.</span></h2>
       <div class="cta-row"><a class="btn btn-dark" href="#download">Download Demodrop</a></div>
-      <p class="micro">Free for Windows · Preview for macOS</p>
+      <!-- macOS hidden until it's been tested on a real Mac. Was: "Free for Windows · Preview for macOS" -->
+      <p class="micro">Free · Windows beta</p>
     </div>
   </section>
 </main>
@@ -1063,6 +1168,9 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
 (function () {
   var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // macOS is hidden until it's been tested on a real Mac. Bring this back with the
+  // macOS button and download card, or it throws on the missing elements.
+  /*
   // Mac visitors get the macOS download first.
   var ua = navigator.userAgent;
   if (/Macintosh|Mac OS X/.test(ua) && !/iPhone|iPad/.test(ua)) {
@@ -1076,6 +1184,7 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
     macCard.classList.add("featured");
     grid.insertBefore(macCard, grid.firstElementChild);
   }
+  */
 
   // Nav turns into a floating pill once you scroll.
   var nav = document.getElementById("nav");
@@ -1359,7 +1468,7 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
 
   // Parallax: layers drift at different speeds. Transform/opacity only, written directly.
   // Off on phones and for reduced motion.
-  var heroInner = document.querySelector(".hero > .inner");
+  var heroInner = document.querySelector(".hero .inner");
   var layers = []
     .concat([].slice.call(document.querySelectorAll(".ch-media .media, .card-media .media")).map(function (el) { return { el: el, kind: "media" }; }))
     .concat([].slice.call(document.querySelectorAll(".ch-title")).map(function (el) { return { el: el, kind: "title" }; }))
@@ -1500,6 +1609,330 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
   } else {
     els.forEach(function (el) { el.classList.add("in"); });
   }
+})();
+</script>
+<script>
+// Hero recorder: point at the hero and Demodrop records you. A filmed cursor,
+// a zoom on every click, a REC chip that becomes a saved take, and a headline
+// that turns to dust under the cursor and re-forms in place.
+// Desktop with a mouse only; phones and reduced motion keep the plain hero.
+(function () {
+  var hero = document.getElementById("hero");
+  if (!hero || !window.requestAnimationFrame) return;
+  var zoomEl = hero.querySelector(".rec-zoom");
+  var chrome = hero.querySelector(".rec-chrome");
+  var cursor = hero.querySelector(".rec-cursor");
+  var timeEl = hero.querySelector(".rec-time");
+  var fileEl = hero.querySelector(".rec-file");
+  var announce = hero.querySelector(".rec-announce");
+  var h1 = hero.querySelector(".dust-wrap h1");
+  var canvas = hero.querySelector(".dust");
+  var ctx = canvas.getContext("2d");
+  var fineMq = matchMedia("(hover: hover) and (pointer: fine)");
+  var reduceMq = matchMedia("(prefers-reduced-motion: reduce)");
+  function enabled() { return fineMq.matches && !reduceMq.matches; }
+
+  // Tuned by eye in the prototype
+  var SMOOTH_MS = 85, LINK_SMOOTH_MS = 18, IDLE_HIDE_MS = 1600;
+  var ZOOM = 1.5, HOLD_MS = 900, ZOOM_IN_MS = 500, ZOOM_OUT_MS = 650;
+  var SAVED_MS = 2400, EASE_IO = "cubic-bezier(0.77, 0, 0.175, 1)";
+  // Dust was tuned on a 46px headline; everything below scales with the real one
+  var DUST_TUNED_PX = 46, DUST_RADIUS = 56, DUST_REST_MS = 200;
+  var WIND_X = 0.05, LIFT = 0.03, SETTLE_WAVE_MS = 450, SETTLE_JITTER = 2.5, SETTLE_FADE_MS = 320;
+
+  var phase = "idle", elapsed = 0, clock = 0, savedTimer = 0;
+  var pointer = { x: 0, y: 0, lastMove: 0, overLink: false }; // client px
+  var pos = { x: 0, y: 0 }, tau = SMOOTH_MS;                  // the filmed cursor, client px
+  var zoomAnim = null, raf = 0, running = false, last = 0;
+
+  function fmt(s) { return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); }
+  function setPhase(p) {
+    phase = p;
+    if (p === "idle") hero.removeAttribute("data-rec"); else hero.setAttribute("data-rec", p);
+  }
+
+  function start() {
+    clearTimeout(savedTimer);
+    clearInterval(clock);
+    elapsed = 0;
+    timeEl.textContent = "00:00";
+    pos.x = pointer.x; pos.y = pointer.y; tau = SMOOTH_MS;
+    setPhase("on");
+    announce.textContent = "Recording";
+    // Counts recorded time only while the tab is visible
+    var tick = performance.now();
+    clock = setInterval(function () {
+      var now = performance.now();
+      if (!document.hidden) elapsed += now - tick;
+      tick = now;
+      timeEl.textContent = fmt(Math.floor(elapsed / 1000));
+    }, 250);
+    kick();
+  }
+
+  function stop() {
+    if (phase !== "on") return;
+    clearInterval(clock);
+    var secs = Math.max(1, Math.round(elapsed / 1000));
+    fileEl.textContent = "take-0412.mp4 · " + fmt(secs);
+    setPhase("saved");
+    announce.textContent = "Take saved, " + secs + " seconds";
+    savedTimer = setTimeout(function () { setPhase("idle"); }, SAVED_MS);
+  }
+
+  function track(e) {
+    pointer.x = e.clientX;
+    pointer.y = e.clientY;
+    pointer.lastMove = performance.now();
+    pointer.overLink = !!(e.target.closest && e.target.closest("a, button"));
+  }
+
+  hero.addEventListener("pointerenter", function (e) {
+    if (e.pointerType !== "mouse" || !enabled()) return;
+    track(e);
+    start();
+  });
+  hero.addEventListener("pointermove", function (e) {
+    if (e.pointerType !== "mouse") return;
+    track(e);
+    // The page can load with the pointer already resting on the hero
+    if (phase !== "on" && enabled()) start();
+    kick();
+  });
+  hero.addEventListener("pointerleave", function (e) {
+    if (e.pointerType === "mouse") stop();
+  });
+
+  // A click on empty space zooms the recording toward it, like Demodrop's auto-zoom.
+  // Links stay links, and selecting text never zooms.
+  hero.addEventListener("click", function (e) {
+    if (phase !== "on" || (e.target.closest && e.target.closest("a, button"))) return;
+    if (String(window.getSelection())) return;
+    var r = hero.getBoundingClientRect();
+    var x = e.clientX - r.left, y = e.clientY - r.top;
+    var ring = document.createElement("span");
+    ring.className = "rec-ripple";
+    ring.style.left = x + "px";
+    ring.style.top = y + "px";
+    ring.addEventListener("animationend", function () { ring.remove(); });
+    chrome.appendChild(ring);
+    zoomAt(x, y);
+  });
+
+  // Translate + scale from 0 0 keeps the clicked point still on screen,
+  // and a second click mid-zoom retargets from wherever the camera is
+  function zoomAt(x, y) {
+    var from = getComputedStyle(zoomEl).transform;
+    var start = from === "none" ? "matrix(1, 0, 0, 1, 0, 0)" : from;
+    var target = "matrix(" + ZOOM + ", 0, 0, " + ZOOM + ", " + x * (1 - ZOOM) + ", " + y * (1 - ZOOM) + ")";
+    var total = ZOOM_IN_MS + HOLD_MS + ZOOM_OUT_MS;
+    if (zoomAnim) zoomAnim.cancel();
+    zoomAnim = zoomEl.animate([
+      { transform: start, easing: EASE_IO },
+      { transform: target, offset: ZOOM_IN_MS / total },
+      { transform: target, offset: (ZOOM_IN_MS + HOLD_MS) / total, easing: EASE_IO },
+      { transform: "matrix(1, 0, 0, 1, 0, 0)" }
+    ], { duration: total });
+  }
+
+  // ---------- Dust ----------
+  // At rest the canvas shows a crisp copy of the headline, drawn glyph by glyph
+  // where the browser put it. Only cells that have turned to dust are cut out.
+  var dust = { ready: false, grains: [], source: null, w: 0, h: 0, dpr: 1, minX: 0, spanX: 1, cell: 2, k: 1 };
+
+  function rasterize() {
+    h1.removeAttribute("data-ready");
+    var cr = canvas.getBoundingClientRect();
+    var w = canvas.offsetWidth, h = canvas.offsetHeight;
+    if (!w || !h) return;
+    var scale = cr.width / w;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var k = parseFloat(getComputedStyle(h1).fontSize) / DUST_TUNED_PX;
+    var cell = Math.max(2, Math.round(2 * k));
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+
+    var src = document.createElement("canvas");
+    src.width = canvas.width;
+    src.height = canvas.height;
+    var sctx = src.getContext("2d", { willReadFrequently: true });
+    sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    sctx.textBaseline = "alphabetic";
+
+    var minX = w, maxX = 0, minY = h, maxY = 0;
+    var walker = document.createTreeWalker(h1, NodeFilter.SHOW_TEXT);
+    var range = document.createRange();
+    for (var node = walker.nextNode(); node; node = walker.nextNode()) {
+      var cs = getComputedStyle(node.parentElement);
+      sctx.font = cs.fontStyle + " " + cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
+      sctx.fillStyle = cs.color;
+      for (var i = 0; i < node.data.length; i++) {
+        var ch = node.data[i];
+        if (!ch.trim()) continue;
+        range.setStart(node, i);
+        range.setEnd(node, i + 1);
+        var r = range.getClientRects()[0];
+        if (!r || !r.width) continue;
+        var m = sctx.measureText(ch);
+        var x = (r.left - cr.left) / scale, top = (r.top - cr.top) / scale, boxH = r.height / scale;
+        // The DOM box is the font's content area; centre the canvas glyph's box on it
+        var pad = (boxH - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2;
+        sctx.fillText(ch, x, top + pad + m.fontBoundingBoxAscent);
+        minX = Math.min(minX, x); maxX = Math.max(maxX, x + r.width / scale);
+        minY = Math.min(minY, top); maxY = Math.max(maxY, top + boxH);
+      }
+    }
+
+    var img = sctx.getImageData(0, 0, src.width, src.height).data;
+    var grains = [];
+    for (var y = Math.max(0, Math.floor(minY)); y < Math.min(h, maxY); y += cell) {
+      for (var gx = Math.max(0, Math.floor(minX)); gx < Math.min(w, maxX); gx += cell) {
+        var p = (Math.floor((y + cell / 2) * dpr) * src.width + Math.floor((gx + cell / 2) * dpr)) * 4;
+        if (img[p + 3] < 24) continue;
+        grains.push({ hx: gx, hy: y, x: gx, y: y, vx: 0, vy: 0, color: "rgb(" + img[p] + "," + img[p + 1] + "," + img[p + 2] + ")",
+          a: img[p + 3] / 255, state: 0, t: 0, life: 0, alpha: 1, tau: 0 });
+      }
+    }
+    dust = { ready: true, grains: grains, source: src, w: w, h: h, dpr: dpr, minX: minX, spanX: Math.max(1, maxX - minX), cell: cell, k: k };
+    h1.setAttribute("data-ready", "");
+    drawDust();
+  }
+
+  // Advances one frame; returns whether any grain is still moving
+  function stepDust(dt, pushing) {
+    var f = dt / 16.67, k = dust.k, cell = dust.cell;
+    var radius = DUST_RADIUS * k, drag = Math.pow(0.985, f);
+    var cr = canvas.getBoundingClientRect();
+    var scale = cr.width / (canvas.offsetWidth || 1);
+    var ax = (pos.x - cr.left) / scale, ay = (pos.y - cr.top) / scale;
+    var busy = false;
+    for (var i = 0; i < dust.grains.length; i++) {
+      var g = dust.grains[i];
+      var cx = g.hx + cell / 2, cy = g.hy + cell / 2;
+      if (g.state === 0) {
+        if (!pushing) continue;
+        var dx = cx - ax, dy = cy - ay, d = Math.hypot(dx, dy);
+        if (d > radius) continue;
+        // Grainy erosion: closer grains are likelier to go this frame
+        if (Math.random() > Math.pow(1 - d / radius, 0.7) * 0.45 * f) continue;
+        var nx = d ? dx / d : 0, ny = d ? dy / d : 0;
+        g.state = 1; g.t = 0; g.alpha = 1;
+        g.vx = (0.4 + Math.random() * 1.3 + nx * 0.7) * k;
+        g.vy = (-(0.2 + Math.random() * 0.9) + ny * 0.7) * k;
+        g.life = 700 + Math.random() * 700;
+        busy = true;
+      } else if (g.state === 1) {
+        busy = true;
+        g.t += dt;
+        g.vx += (WIND_X + (Math.random() - 0.5) * 0.18) * k * f;
+        g.vy += (-LIFT + (Math.random() - 0.5) * 0.18) * k * f;
+        g.vx *= drag; g.vy *= drag;
+        g.x += g.vx * f; g.y += g.vy * f;
+        var e = Math.min(1, g.t / g.life);
+        g.alpha = 1 - e * e;
+        if (e >= 1) { g.state = 2; g.t = 0; g.alpha = 0; }
+      } else if (g.state === 2) {
+        busy = true;
+        g.t += dt;
+        var near = pushing && Math.hypot(cx - ax, cy - ay) < radius * 1.25;
+        var wave = ((g.hx - dust.minX) / dust.spanX) * SETTLE_WAVE_MS + ((g.hy * 7) % 23) * 6;
+        if (g.t > DUST_REST_MS + wave && !near) {
+          // Re-form in place: appear on its own spot, a hair off, and settle.
+          // A grain never flies back along the path it blew away on.
+          g.state = 3;
+          g.x = g.hx + (Math.random() - 0.5) * SETTLE_JITTER * k;
+          g.y = g.hy - Math.random() * SETTLE_JITTER * k;
+          g.alpha = 0;
+          g.tau = 90 + Math.random() * 90;
+          g.life = SETTLE_FADE_MS * (0.7 + Math.random() * 0.6);
+        }
+      } else {
+        busy = true;
+        var s = 1 - Math.exp(-dt / g.tau);
+        g.x += (g.hx - g.x) * s; g.y += (g.hy - g.y) * s;
+        g.alpha = Math.min(1, g.alpha + dt / g.life);
+        if (g.alpha >= 1 && Math.hypot(g.hx - g.x, g.hy - g.y) < 0.35) { g.state = 0; g.x = g.hx; g.y = g.hy; }
+      }
+    }
+    return busy;
+  }
+
+  function drawDust() {
+    var cell = dust.cell;
+    ctx.setTransform(dust.dpr, 0, 0, dust.dpr, 0, 0);
+    ctx.globalCompositeOperation = "source-over";
+    ctx.globalAlpha = 1;
+    ctx.clearRect(0, 0, dust.w, dust.h);
+    if (!dust.source) return;
+    ctx.drawImage(dust.source, 0, 0, dust.w, dust.h);
+    // Cut out the cells whose grains have left; a settling grain fills its own gap back in
+    ctx.globalCompositeOperation = "destination-out";
+    for (var i = 0; i < dust.grains.length; i++) {
+      var g = dust.grains[i];
+      if (g.state === 0) continue;
+      ctx.globalAlpha = g.state === 3 ? 1 - g.alpha : 1;
+      ctx.fillRect(g.hx, g.hy, cell, cell);
+    }
+    ctx.globalCompositeOperation = "source-over";
+    for (var j = 0; j < dust.grains.length; j++) {
+      var q = dust.grains[j];
+      if ((q.state !== 1 && q.state !== 3) || q.alpha <= 0.01) continue;
+      ctx.globalAlpha = q.alpha * q.a;
+      ctx.fillStyle = q.color;
+      ctx.fillRect(q.x, q.y, cell, cell);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ---------- One loop for the cursor and the dust; it sleeps when nothing moves ----------
+  function frame(now) {
+    var dt = Math.min(now - last, 48);
+    last = now;
+    var busy = false;
+    if (phase === "on") {
+      busy = true;
+      // Over something clickable the cursor tightens up, so the hand sits where the click lands.
+      // The smoothing itself eases, so tightening up glides rather than snaps.
+      var target = pointer.overLink ? Math.min(SMOOTH_MS, LINK_SMOOTH_MS) : SMOOTH_MS;
+      tau += (target - tau) * (1 - Math.exp(-dt / 100));
+      var s = 1 - Math.exp(-dt / Math.max(tau, 1));
+      pos.x += (pointer.x - pos.x) * s;
+      pos.y += (pointer.y - pos.y) * s;
+      var r = hero.getBoundingClientRect();
+      cursor.style.transform = "translate3d(" + (pos.x - r.left) + "px, " + (pos.y - r.top) + "px, 0)";
+      // Hides when idle, like Demodrop's, but never while it rests on something clickable
+      cursor.toggleAttribute("data-hidden", now - pointer.lastMove > IDLE_HIDE_MS && !pointer.overLink);
+      cursor.toggleAttribute("data-link", pointer.overLink);
+    }
+    if (dust.ready) {
+      if (stepDust(dt, phase === "on")) busy = true;
+      drawDust();
+    }
+    if (busy && !document.hidden) raf = requestAnimationFrame(frame);
+    else running = false;
+  }
+  function kick() {
+    if (running) return;
+    running = true;
+    last = performance.now();
+    raf = requestAnimationFrame(frame);
+  }
+  document.addEventListener("visibilitychange", function () { if (!document.hidden && phase === "on") kick(); });
+
+  // The headline turns to canvas once it has finished rising in and the fonts are in.
+  // Without a mouse (or with reduced motion) it stays plain text.
+  // Wait for the rise itself, not a timer: a background tab holds animations back,
+  // and measuring mid-rise would draw the copy in the wrong place
+  var risen = new Promise(function (done) {
+    var running = h1.getAnimations ? h1.getAnimations() : [];
+    if (!running.length) return done();
+    Promise.all(running.map(function (a) { return a.finished; })).then(done, done);
+  });
+  Promise.all([document.fonts ? document.fonts.ready : null, risen]).then(function () {
+    if (!enabled()) return;
+    rasterize();
+    if ("ResizeObserver" in window) new ResizeObserver(function () { if (dust.ready) rasterize(); }).observe(h1);
+  });
 })();
 </script>
 </body>
