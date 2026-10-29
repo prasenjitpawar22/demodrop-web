@@ -404,42 +404,28 @@ section { position: relative; }
 
 /* Finishing touches: four clip cards */
 .finish { margin-top: 36px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-/* ---------- Feature story: pinned while you scroll; two features at a time ---------- */
-.story { position: relative; height: calc(var(--n) * 72vh + 100vh); margin-top: 40px; }
-.st-sticky { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; gap: 22px; padding-top: 40px; }
-.st-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.st-count { font-size: 12.5px; color: var(--faint); }
-.st-count b { color: var(--ink); font-weight: 500; }
-.st-dots { display: flex; gap: 6px; }
-.st-dot { position: relative; width: 34px; height: 18px; display: grid; place-items: center; cursor: pointer; }
-.st-dot i { display: block; width: 100%; height: 3px; border-radius: 3px; background: var(--line-2); overflow: hidden; position: relative; }
-.st-dot i::after { content: ""; position: absolute; inset: 0; background: var(--ink); transform-origin: left; transform: scaleX(var(--p, 0)); }
-.st-dot.done i::after { transform: scaleX(1); }
-.st-dot { transition: transform 160ms var(--ease-out); }
-.st-dot::before { content: ""; position: absolute; inset: -11px -3px; }
-.st-dot:active { transform: scale(0.96); }
-.st-dot i { transition: background-color 150ms ease; }
-@media (hover: hover) and (pointer: fine) { .st-dot:hover i { background: var(--faint); } }
-.st-stage { display: grid; perspective: 1800px; }
-.st-pair { grid-area: 1 / 1; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: end; pointer-events: none; }
-.st-pair.solo { grid-template-columns: minmax(0, 0.7fr); justify-content: center; }
-.st-card { min-width: 0; opacity: 0; transform: translateY(8%) scale(0.95) rotateX(9deg); transform-origin: 50% 100%;
-  transition: opacity 450ms ease, transform 750ms var(--ease-out); }
-.st-pair:not(.on) .st-card { transition-duration: 250ms, 400ms; }
-.st-pair.past .st-card { transform: translateY(-6%) scale(0.93) rotateX(-4deg); }
-.st-pair.on { pointer-events: auto; }
-.st-pair.on .st-card { opacity: 1; transform: none; }
-.st-cap { padding: 0 4px; }
-.st-eye { display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 10px 0 8px; border-radius: 999px;
-  font-size: 12.5px; font-weight: 500; color: var(--ink-2); background: rgba(17,16,22,0.045); box-shadow: inset 0 0 0 1px var(--line); }
-.st-eye svg { width: 14px; height: 14px; }
-.st-cap h3 { margin: 14px 0 0; font-size: clamp(20px, 1.9vw, 25px); line-height: 1.15; letter-spacing: -0.03em; font-weight: 600; }
-.st-cap p { margin: 6px 0 0; color: var(--muted); font-size: 15px; line-height: 1.55; max-width: 480px; }
-.st-cap .bc-specs { margin-top: 12px; }
-.st-frame { position: relative; margin-top: 18px; aspect-ratio: 16 / 9; border-radius: 20px; overflow: hidden; background: #121119; will-change: transform;
+/* ---------- Features: pick one from the list, see its clip big ---------- */
+.fl { margin-top: 56px; display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr); gap: 48px; align-items: start; }
+.fl-list { list-style: none; margin: 0; padding: 0; border-top: var(--hair) solid var(--line); }
+.fl-list li { border-bottom: var(--hair) solid var(--line); }
+.fl-item { width: 100%; display: flex; align-items: center; gap: 12px; padding: 15px 0; text-align: left;
+  font-size: 16px; font-weight: 500; letter-spacing: -0.01em; color: var(--muted); transition: color 150ms ease; }
+.fl-item svg { width: 16px; height: 16px; flex: none; }
+.fl-item[aria-selected="true"] { color: var(--ink); }
+@media (hover: hover) and (pointer: fine) { .fl-item:hover { color: var(--ink-2); } }
+/* The open item's copy expands in place; collapsed copy stays in the DOM */
+.fl-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 250ms cubic-bezier(0.32, 0.72, 0, 1); }
+.fl-body[data-open] { grid-template-rows: 1fr; }
+.fl-body > div { overflow: hidden; min-height: 0; }
+.fl-body p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.55; }
+.fl-body .bc-specs { margin: 12px 0 18px; }
+.fl-stage { position: sticky; top: 96px; }
+.fl-stage .media { transition: opacity 180ms ease, visibility 0s 180ms; }
+.fl-stage .media.on { transition-delay: 0s; }
+.fl.instant .fl-body, .fl.instant .fl-stage .media { transition: none; }
+.st-frame { position: relative; aspect-ratio: 16 / 9; border-radius: 20px; overflow: hidden; background: #121119;
   box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 0 2px 4px rgba(17,16,22,0.06), 0 24px 50px -20px rgba(17,16,22,0.35), 0 60px 120px -50px rgba(17,16,22,0.3); }
 .st-frame > .media { border-radius: inherit; }
-@media (max-height: 820px) { .st-cap p { display: none; } .st-sticky { gap: 16px; } }
 
 /* Feature bento: a 12-column grid of clip cards. Copy on top, the clip below in an inset frame.
    Each card has a depth (data-depth) and drifts at its own speed as you scroll. */
@@ -630,15 +616,10 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
   .notes li, .notes li + li { padding: 18px 0; border-left: 0; }
   .notes li + li { border-top: var(--hair) solid var(--line); }
   .bento { grid-template-columns: 1fr; gap: 16px; margin-top: 40px; }
-  /* Phones: the story becomes a simple stack of captioned clips */
-  .story { height: auto; margin-top: 32px; }
-  .st-sticky { position: static; height: auto; display: block; padding: 0; }
-  .st-bar { display: none; }
-  .st-stage { display: grid; gap: 44px; perspective: none; }
-  .st-pair, .st-pair.solo { grid-area: auto; grid-template-columns: 1fr; gap: 44px; pointer-events: auto; }
-  .st-card, .st-pair.past .st-card { opacity: 1; transform: none; }
-  .st-cap h3 { font-size: 22px; }
-  .st-frame { border-radius: 16px; transform: none !important; }
+  /* Phones: the clip sits above the list and stays in view while you pick */
+  .fl { grid-template-columns: 1fr; gap: 20px; margin-top: 40px; }
+  .fl-stage { top: 72px; z-index: 1; order: -1; }
+  .st-frame { border-radius: 16px; }
   .bcard.s7, .bcard.s5, .bcard.s6, .bcard.s4 { grid-column: auto; }
   .bcard { padding: 22px 20px 0; border-radius: 22px; }
 
@@ -733,8 +714,7 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
   .enter { animation: fade 300ms ease both; }
   @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
   .tabs-hl.ready { transition-duration: 0ms; }
-  .st-card, .st-pair:not(.on) .st-card { transition: opacity 250ms ease; }
-  .st-card, .st-pair.past .st-card { transform: none; }
+  .fl-body, .fl-stage .media { transition: none; }
   .js .reveal { transform: none; filter: none; transition: opacity 300ms ease; }
   .js .pv-log li { transform: none; filter: none; transition: opacity 300ms ease; transition-delay: 0ms; }
   .stage-scroll { height: auto; padding-bottom: 96px; }
@@ -922,101 +902,56 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
         <p class="reveal" style="--d:80ms">Record once and use your app the way you normally would. Demodrop takes care of the motion, the framing and the finishing touches, so the video looks deliberate instead of just captured.</p>
       </div>
 
-      <div class="story" id="story" style="--n:5">
-        <div class="st-sticky">
-          <div class="st-bar"><span class="st-count mono"><b id="stNum">01</b> / 05</span><span class="st-dots"><button type="button" class="st-dot on" data-i="0" aria-label="Show Auto-zoom and Timeline"><i></i></button><button type="button" class="st-dot" data-i="1" aria-label="Show Cursor and Framing"><i></i></button><button type="button" class="st-dot" data-i="2" aria-label="Show Formats and Speed-ups"><i></i></button><button type="button" class="st-dot" data-i="3" aria-label="Show Blur masks and Record"><i></i></button><button type="button" class="st-dot" data-i="4" aria-label="Show Export"><i></i></button></span></div>
-          <div class="st-stage">
-            <div class="st-pair on" data-i="0">
-              <article class="st-card">
-                <div class="st-cap">
-                  <span class="st-eye"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3M7 5v4M5 7h4"/></svg>Auto-zoom</span>
-                  <h3>Every click, in focus.</h3>
-                  <p>Demodrop watches where you click, glides in on the moment that matters, then eases back out. There’s nothing to keyframe.</p>
-                  <ul class="bc-specs"><li>Automatic on every click</li><li>1.2× – 3×</li><li>Camera or lens</li></ul>
-                </div>
-                <div class="st-frame"><figure class="media" data-src="/assets/features/zoom.mp4" data-poster="/assets/features/zoom.jpg" data-audio data-label="Auto-zoom on every click" data-loop></figure></div>
-              </article>
-              <article class="st-card">
-                <div class="st-cap">
-                  <span class="st-eye"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 4.5h6M5 8h8M3 11.5h5"/></svg>Timeline</span>
-                  <h3>Zooms are just blocks.</h3>
-                  <p>Drag a zoom to move it, pull an edge to change how long it lasts, and slide to set how close it gets.</p>
-                  <ul class="bc-specs"><li>Drag</li><li>Resize</li><li>Per-zoom level</li></ul>
-                </div>
-                <div class="st-frame"><figure class="media" data-src="/assets/features/zoom-timeline.mp4" data-poster="/assets/features/zoom-timeline.jpg" data-audio data-label="Editing zooms on the timeline" data-loop></figure></div>
-              </article>
-            </div>
-            <div class="st-pair" data-i="1">
-              <article class="st-card">
-                <div class="st-cap">
-                  <span class="st-eye"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 2v10.5l2.8-2.5 1.9 4.3 1.8-.8-1.9-4.1h3.8L3.5 2Z"/></svg>Cursor</span>
-                  <h3>A pointer that looks filmed.</h3>
-                  <p>Recorded without the cursor, then redrawn crisp and smoothed, so it stays sharp at any zoom.</p>
-                  <ul class="bc-specs"><li>Smoothing</li><li>Click ripples</li><li>Hides when idle</li></ul>
-                </div>
-                <div class="st-frame"><figure class="media" data-src="/assets/features/cursor.mp4" data-poster="/assets/features/cursor.jpg" data-audio data-label="The smoothed cursor and click ripples" data-loop></figure></div>
-              </article>
-              <article class="st-card">
-                <div class="st-cap">
-                  <span class="st-eye"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="3"/><rect x="4.75" y="4.75" width="6.5" height="6.5" rx="1.2"/></svg>Framing</span>
-                  <h3>Frame it like a product shot.</h3>
-                  <p>Wallpapers, padding, rounded corners and a soft shadow around your recording.</p>
-                  <ul class="bc-specs"><li>Wallpapers</li><li>Padding</li><li>Corners and shadow</li></ul>
-                </div>
-                <div class="st-frame"><figure class="media" data-src="/assets/features/backgrounds.mp4" data-poster="/assets/features/backgrounds.jpg" data-audio data-label="Switching backgrounds, padding and corners" data-loop></figure></div>
-              </article>
-            </div>
-            <div class="st-pair" data-i="2">
-              <article class="st-card">
-                <div class="st-cap">
-                  <span class="st-eye"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="4.5" width="7" height="7" rx="1.4"/><rect x="10.5" y="2" width="4" height="12" rx="1.2"/></svg>Formats</span>
-                  <h3>One take, every feed.</h3>
-                  <p>Reframe the same recording for landscape, square or vertical in one click.</p>
-                  <ul class="bc-specs"><li>16:9</li><li>1:1</li><li>9:16</li></ul>
-                </div>
-                <div class="st-frame"><figure class="media" data-src="/assets/features/formats.mp4" data-poster="/assets/features/formats.jpg" data-audio data-label="Reframing to 16:9, 1:1 and 9:16" data-loop></figure></div>
-              </article>
-              <article class="st-card">
-                <div class="st-cap">
-                  <span class="st-eye"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3.5v9L7 8 1.5 3.5Zm6.5 0v9L13.5 8 8 3.5Z"/></svg>Speed-ups</span>
-                  <h3>Skip the boring bits.</h3>
-                  <p>Fast-forward through typing and loading screens so the video keeps moving.</p>
-                  <ul class="bc-specs"><li>Typing</li><li>Loading</li><li>Waiting</li></ul>
-                </div>
-                <div class="st-frame"><figure class="media" data-src="/assets/features/speed.mp4" data-poster="/assets/features/speed.jpg" data-audio data-label="Speed-ups" data-loop></figure></div>
-              </article>
-            </div>
-            <div class="st-pair" data-i="3">
-              <article class="st-card">
-                <div class="st-cap">
-                  <span class="st-eye"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M5 6.5h6M5 9.5h3.5" stroke-dasharray="1.5 1.5"/></svg>Blur masks</span>
-                  <h3>Hide what’s private.</h3>
-                  <p>Blur emails, keys and customer data before anything leaves your screen.</p>
-                  <ul class="bc-specs"><li>Emails</li><li>API keys</li><li>Customer data</li></ul>
-                </div>
-                <div class="st-frame"><figure class="media" data-src="/assets/features/blur.mp4" data-poster="/assets/features/blur.jpg" data-audio data-label="Blur masks" data-loop></figure></div>
-              </article>
-              <article class="st-card">
-                <div class="st-cap">
-                  <span class="st-eye"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2.6" fill="currentColor" stroke="none"/></svg>Record</span>
-                  <h3>A screen or one window.</h3>
-                  <p>Pick your whole display or a single app window, then a 3-2-1 countdown.</p>
-                  <ul class="bc-specs"><li>Native resolution</li><li>Mic and system audio</li><li>Ctrl+Shift+2</li></ul>
-                </div>
-                <div class="st-frame"><figure class="media" data-src="/assets/features/record.mp4" data-poster="/assets/features/record.jpg" data-audio data-label="Choosing what to record" data-loop></figure></div>
-              </article>
-            </div>
-            <div class="st-pair solo" data-i="4">
-              <article class="st-card">
-                <div class="st-cap">
-                  <span class="st-eye"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.5v8m0 0L5 7.5m3 3 3-3M3 13.5h10"/></svg>Export</span>
-                  <h3>MP4 or GIF, ready to post.</h3>
-                  <p>A 1080p or 4K MP4 at 60 fps with motion blur, or a GIF for READMEs, docs and chats.</p>
-                  <ul class="bc-specs"><li>1080p · 4K</li><li>60 fps</li><li>GIF</li></ul>
-                </div>
-                <div class="st-frame"><figure class="media" data-src="/assets/features/export.mp4" data-poster="/assets/features/export.jpg" data-audio data-label="Exporting MP4 or GIF" data-loop></figure></div>
-              </article>
-            </div>
+      <div class="fl">
+        <ul class="fl-list" role="tablist" aria-orientation="vertical" aria-label="Features">
+          <li role="presentation">
+            <button type="button" class="fl-item" role="tab" id="fl-t0" aria-controls="fl-stage" aria-selected="true"><svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3M7 5v4M5 7h4"/></svg>Every click, in focus.</button>
+            <div class="fl-body" data-open><div><p>Demodrop watches where you click, glides in on the moment that matters, then eases back out. There’s nothing to keyframe.</p><ul class="bc-specs"><li>Automatic on every click</li><li>1.2× – 3×</li><li>Camera or lens</li></ul></div></div>
+          </li>
+          <li role="presentation">
+            <button type="button" class="fl-item" role="tab" id="fl-t1" aria-controls="fl-stage" aria-selected="false" tabindex="-1"><svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 4.5h6M5 8h8M3 11.5h5"/></svg>Zooms are just blocks.</button>
+            <div class="fl-body" aria-hidden="true"><div><p>Drag a zoom to move it, pull an edge to change how long it lasts, and slide to set how close it gets.</p><ul class="bc-specs"><li>Drag</li><li>Resize</li><li>Per-zoom level</li></ul></div></div>
+          </li>
+          <li role="presentation">
+            <button type="button" class="fl-item" role="tab" id="fl-t2" aria-controls="fl-stage" aria-selected="false" tabindex="-1"><svg aria-hidden="true" viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 2v10.5l2.8-2.5 1.9 4.3 1.8-.8-1.9-4.1h3.8L3.5 2Z"/></svg>A pointer that looks filmed.</button>
+            <div class="fl-body" aria-hidden="true"><div><p>Recorded without the cursor, then redrawn crisp and smoothed, so it stays sharp at any zoom.</p><ul class="bc-specs"><li>Smoothing</li><li>Click ripples</li><li>Hides when idle</li></ul></div></div>
+          </li>
+          <li role="presentation">
+            <button type="button" class="fl-item" role="tab" id="fl-t3" aria-controls="fl-stage" aria-selected="false" tabindex="-1"><svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="3"/><rect x="4.75" y="4.75" width="6.5" height="6.5" rx="1.2"/></svg>Frame it like a product shot.</button>
+            <div class="fl-body" aria-hidden="true"><div><p>Wallpapers, padding, rounded corners and a soft shadow around your recording.</p><ul class="bc-specs"><li>Wallpapers</li><li>Padding</li><li>Corners and shadow</li></ul></div></div>
+          </li>
+          <li role="presentation">
+            <button type="button" class="fl-item" role="tab" id="fl-t4" aria-controls="fl-stage" aria-selected="false" tabindex="-1"><svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="4.5" width="7" height="7" rx="1.4"/><rect x="10.5" y="2" width="4" height="12" rx="1.2"/></svg>One take, every feed.</button>
+            <div class="fl-body" aria-hidden="true"><div><p>Reframe the same recording for landscape, square or vertical in one click.</p><ul class="bc-specs"><li>16:9</li><li>1:1</li><li>9:16</li></ul></div></div>
+          </li>
+          <li role="presentation">
+            <button type="button" class="fl-item" role="tab" id="fl-t5" aria-controls="fl-stage" aria-selected="false" tabindex="-1"><svg aria-hidden="true" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3.5v9L7 8 1.5 3.5Zm6.5 0v9L13.5 8 8 3.5Z"/></svg>Skip the boring bits.</button>
+            <div class="fl-body" aria-hidden="true"><div><p>Fast-forward through typing and loading screens so the video keeps moving.</p><ul class="bc-specs"><li>Typing</li><li>Loading</li><li>Waiting</li></ul></div></div>
+          </li>
+          <li role="presentation">
+            <button type="button" class="fl-item" role="tab" id="fl-t6" aria-controls="fl-stage" aria-selected="false" tabindex="-1"><svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M5 6.5h6M5 9.5h3.5" stroke-dasharray="1.5 1.5"/></svg>Hide what’s private.</button>
+            <div class="fl-body" aria-hidden="true"><div><p>Blur emails, keys and customer data before anything leaves your screen.</p><ul class="bc-specs"><li>Emails</li><li>API keys</li><li>Customer data</li></ul></div></div>
+          </li>
+          <li role="presentation">
+            <button type="button" class="fl-item" role="tab" id="fl-t7" aria-controls="fl-stage" aria-selected="false" tabindex="-1"><svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2.6" fill="currentColor" stroke="none"/></svg>A screen or one window.</button>
+            <div class="fl-body" aria-hidden="true"><div><p>Pick your whole display or a single app window, then a 3-2-1 countdown.</p><ul class="bc-specs"><li>Native resolution</li><li>Mic and system audio</li><li>Ctrl+Shift+2</li></ul></div></div>
+          </li>
+          <li role="presentation">
+            <button type="button" class="fl-item" role="tab" id="fl-t8" aria-controls="fl-stage" aria-selected="false" tabindex="-1"><svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.5v8m0 0L5 7.5m3 3 3-3M3 13.5h10"/></svg>MP4 or GIF, ready to post.</button>
+            <div class="fl-body" aria-hidden="true"><div><p>A 1080p or 4K MP4 at 60 fps with motion blur, or a GIF for READMEs, docs and chats.</p><ul class="bc-specs"><li>1080p · 4K</li><li>60 fps</li><li>GIF</li></ul></div></div>
+          </li>
+        </ul>
+        <div class="fl-stage" id="fl-stage" role="tabpanel" aria-labelledby="fl-t0">
+          <div class="st-frame">
+            <figure class="media on" data-src="/assets/features/zoom.mp4" data-poster="/assets/features/zoom.jpg" data-audio data-label="Auto-zoom on every click" data-loop></figure>
+            <figure class="media" data-src="/assets/features/zoom-timeline.mp4" data-poster="/assets/features/zoom-timeline.jpg" data-audio data-label="Editing zooms on the timeline" data-loop></figure>
+            <figure class="media" data-src="/assets/features/cursor.mp4" data-poster="/assets/features/cursor.jpg" data-audio data-label="The smoothed cursor and click ripples" data-loop></figure>
+            <figure class="media" data-src="/assets/features/backgrounds.mp4" data-poster="/assets/features/backgrounds.jpg" data-audio data-label="Switching backgrounds, padding and corners" data-loop></figure>
+            <figure class="media" data-src="/assets/features/formats.mp4" data-poster="/assets/features/formats.jpg" data-audio data-label="Reframing to 16:9, 1:1 and 9:16" data-loop></figure>
+            <figure class="media" data-src="/assets/features/speed.mp4" data-poster="/assets/features/speed.jpg" data-audio data-label="Speed-ups" data-loop></figure>
+            <figure class="media" data-src="/assets/features/blur.mp4" data-poster="/assets/features/blur.jpg" data-audio data-label="Blur masks" data-loop></figure>
+            <figure class="media" data-src="/assets/features/record.mp4" data-poster="/assets/features/record.jpg" data-audio data-label="Choosing what to record" data-loop></figure>
+            <figure class="media" data-src="/assets/features/export.mp4" data-poster="/assets/features/export.jpg" data-audio data-label="Exporting MP4 or GIF" data-loop></figure>
           </div>
         </div>
       </div>
@@ -1259,7 +1194,10 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
   }
   if ("IntersectionObserver" in window) {
     var near = new IntersectionObserver(function (es) {
-      es.forEach(function (e) { if (e.isIntersecting) { load(e.target); near.unobserve(e.target); } });
+      es.forEach(function (e) {
+        if (!e.isIntersecting || (e.target.closest(".fl-stage") && !e.target.classList.contains("on"))) return;
+        load(e.target); near.unobserve(e.target);
+      });
     }, { rootMargin: "400px 0px" });
     var seen = new IntersectionObserver(function (es) {
       es.forEach(function (e) { e.target._inView = e.isIntersecting; playIfShown(e.target); });
@@ -1491,66 +1429,42 @@ footer nav { display: flex; gap: 22px; flex-wrap: wrap; }
     // they also rise, untilt and grow into place as they come up the screen.
     .concat([].slice.call(document.querySelectorAll(".bcard")).map(function (el) { return { el: el, kind: "bento", depth: +el.dataset.depth || 0.6 }; }));
 
-  // Feature story: the section pins, and each stretch of scroll brings the next pair of features forward.
-  // The outgoing pair sinks back, the incoming one rises, both cards in step;
-  // only the clips on screen play, and both drift together.
-  var story = document.getElementById("story");
-  var stPairs = story ? [].slice.call(story.querySelectorAll(".st-pair")) : [];
-  var stDots = story ? [].slice.call(story.querySelectorAll(".st-dot")) : [];
-  var stNum = document.getElementById("stNum");
-  var stCur = -1, stMode = null;
-  function stMedias(i) { return [].slice.call(stPairs[i].querySelectorAll(".media")); }
-  function stActivate(i) {
-    if (i === stCur) return;
-    stCur = i;
-    stPairs.forEach(function (el, j) {
-      el.classList.toggle("on", j === i);
-      el.classList.toggle("past", j < i);
-      stMedias(j).forEach(function (m) {
+  // Features: one clip on the stage at a time. Picking a feature opens its copy and swaps the clip;
+  // only the shown clip loads and plays. Arrow keys move through the list (roving tabindex).
+  var fl = document.querySelector(".fl");
+  if (fl) {
+    var flTabs = [].slice.call(fl.querySelectorAll(".fl-item"));
+    var flBodies = [].slice.call(fl.querySelectorAll(".fl-body"));
+    var flMedia = [].slice.call(fl.querySelectorAll(".fl-stage .media"));
+    var flStage = document.getElementById("fl-stage");
+    var flSelect = function (i, focus) {
+      flTabs.forEach(function (t, j) { t.setAttribute("aria-selected", j === i); t.tabIndex = j === i ? 0 : -1; });
+      flBodies.forEach(function (b, j) { b.toggleAttribute("data-open", j === i); b.setAttribute("aria-hidden", j !== i); });
+      flMedia.forEach(function (m, j) {
         var show = j === i;
         if (!show && m.classList.contains("sound")) setSound(m, false);
         m.classList.toggle("on", show);
-        if (show) { load(m); m._inView = true; }
+        // Show the poster at once rather than the placeholder while the clip loads
+        if (show) { load(m); m.classList.add("ready"); }
         playIfShown(m);
       });
-    });
-    stDots.forEach(function (d, j) { d.classList.toggle("on", j === i); d.classList.toggle("done", j < i); if (j !== i) d.querySelector("i").style.removeProperty("--p"); });
-    stNum.textContent = ("0" + (i + 1)).slice(-2);
-  }
-  function stLayout() {
-    var desk = wide.matches;
-    if (desk === stMode) return;
-    stMode = desk;
-    stCur = -1;
-    stPairs.forEach(function (el, j) {
-      stMedias(j).forEach(function (m) { m.classList.toggle("on", !desk); });
-      [].slice.call(el.querySelectorAll(".st-frame")).forEach(function (f) { f.style.transform = ""; });
-    });
-  }
-  function storyUpdate() {
-    if (!story) return;
-    stLayout();
-    if (!stMode) return;
-    var total = story.offsetHeight - innerHeight;
-    var prog = clamp(-story.getBoundingClientRect().top / total);
-    var n = stPairs.length, f = prog * n;
-    var i = Math.min(n - 1, Math.floor(f)), local = Math.min(1, f - i);
-    stActivate(i);
-    stDots[i].querySelector("i").style.setProperty("--p", local.toFixed(3));
-    if (!reduce) [].slice.call(stPairs[i].querySelectorAll(".st-frame")).forEach(function (fr) {
-      fr.style.transform = "translateY(" + ((0.5 - local) * 32).toFixed(1) + "px)";
+      flStage.setAttribute("aria-labelledby", flTabs[i].id);
+      if (focus) flTabs[i].focus();
+    };
+    flTabs.forEach(function (t, i) {
+      t.addEventListener("click", function () { flSelect(i); });
+      t.addEventListener("keydown", function (e) {
+        var n = flTabs.length;
+        var to = e.key === "ArrowDown" ? (i + 1) % n : e.key === "ArrowUp" ? (i - 1 + n) % n : e.key === "Home" ? 0 : e.key === "End" ? n - 1 : -1;
+        if (to < 0) return;
+        e.preventDefault();
+        fl.classList.add("instant");
+        flSelect(to, true);
+        void fl.offsetWidth; // apply the new state without transitions before re-enabling them
+        fl.classList.remove("instant");
+      });
     });
   }
-  stDots.forEach(function (d, i) {
-    d.addEventListener("click", function () {
-      var total = story.offsetHeight - innerHeight;
-      var y = story.getBoundingClientRect().top + scrollY + total * ((i + 0.3) / stPairs.length);
-      scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" });
-    });
-  });
-  addEventListener("scroll", storyUpdate, { passive: true });
-  addEventListener("resize", function () { stMode = null; storyUpdate(); });
-  storyUpdate();
 
   // Privacy activity window: plays once when it's half in view. Rows land in turn; "Saved on this PC" counts up
   // as the take and the export are written. Uploads never move from 0 B.
